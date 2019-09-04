@@ -19,6 +19,8 @@ import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
 import { UnauthorizedComponent } from './views/unauthorized/unauthorized.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { API_BASE_URL } from 'src/swagger/swag-proxy';
+import { SwaggerModule } from 'src/swagger/swagger-module';
 
 // Import 3rd party components
 // Import routing module
@@ -63,10 +65,14 @@ const APP_CONTAINERS = [
     P404Component,
     P500Component,
     LoginComponent,
+    SwaggerModule,
     RegisterComponent,
     UnauthorizedComponent, // -- Feature from this project
     LoginCallbackComponent // -- Feature from this project
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [
+    { provide: API_BASE_URL, useValue: 'http://localhost:5000/'}
+  ]
 })
 export class AppModule { }

@@ -1,0 +1,9 @@
+<form [formGroup]="form">
+    <mat-form-field>
+        <input matInput placeholder="login" required formControlName="login">
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput placeholder="senha" required formControlName="password" type="password">
+    </mat-form-field>
+    <button (click)="save()" [disabled]="form.invalid" mat-raised-button>Logar</button>
+</form>
