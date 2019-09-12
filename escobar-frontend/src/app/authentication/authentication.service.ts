@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { JwksValidationHandler, OAuthService } from 'angular-oauth2-oidc';
-import { Subject, Observable } from 'rxjs';
+import jwt_decode from 'jwt-decode';
+import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+
+import { IBaseUser } from './ICurrentUser';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +14,7 @@ export class AuthenticationService {
   private loginFailed: boolean;
   public finishedLoading = false;
   public finishedLoadingSubject = new Subject<boolean>();
+  public user: IBaseUser;
 
 
   private checkValidAccessToken() {
@@ -28,7 +32,7 @@ export class AuthenticationService {
   constructor(private oauthService: OAuthService) {
     this.checkValidAccessToken();
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
-    this.runInitialLoginSequence();
+    this.getUser();
   }
 
   public runInitialLoginSequence(): Promise<boolean> {
@@ -43,7 +47,22 @@ export class AuthenticationService {
       .finally(() => {
         this.finishedLoading = true;
         this.finishedLoadingSubject.next(true);
+        this.getUser();
       });
+  }
+
+  public getUser() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const userFromJWT = jwt_decode(token);
+      this.user = {
+        id: userFromJWT.UserId,
+        name: userFromJWT.UserName,
+      };
+    }
+    if (this.user) {
+      return this.user;
+    }
   }
 
   public login(): void {
@@ -63,6 +82,10 @@ export class AuthenticationService {
       map(() => {
         return !this.loginFailed && this.oauthService.hasValidAccessToken();
       }));
+  }
+
+  public isLoggedIn() {
+    return this.oauthService.hasValidAccessToken();
   }
 
   public hasValidAdminToken(): boolean | Observable<boolean> {
