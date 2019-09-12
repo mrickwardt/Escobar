@@ -6,11 +6,12 @@
             </button>
             <h3 id="logo">Escobar</h3>
         </div>
-        <h6>
+        <div *ngIf="auth.user && auth.user.name">
+            <span>{{auth.user.name}}</span>
             <button mat-icon-button (click)="logout()">
                 <mat-icon>exit_to_app</mat-icon>
             </button>
-        </h6>
+        </div>
     </div>
     <mat-drawer-container>
         <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'">

@@ -37,6 +37,10 @@ namespace Server
                     RedirectUris = { "http://localhost:4200" },
                     PostLogoutRedirectUris =  { "http://localhost:4200/" },
                     AllowedCorsOrigins = { "http://localhost:4200" },
+                    ConsentLifetime = 1800,
+                    AccessTokenLifetime = 1800,
+                    IdentityTokenLifetime = 1800,
+                    AuthorizationCodeLifetime = 1800,
                     AllowedScopes =
                     {
                         IdentityServerConstants.StandardScopes.OpenId,

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserDtoRegister } from 'src/swagger/swag-proxy';
+
 import { AuthenticationService } from '../authentication/authentication.service';
 import { UserService } from './user.service';
 
@@ -14,7 +16,12 @@ export class RegisterComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
     private userService: UserService,
-    private authService: AuthenticationService) { }
+    private authService: AuthenticationService,
+    private router: Router) {
+    // if (this.authService.isLoggedIn()) {
+    //   this.router.navigateByUrl('/home');
+    // }
+  }
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
@@ -42,8 +49,9 @@ export class RegisterComponent implements OnInit {
       }
       const user: UserDtoRegister = new UserDtoRegister({ nome: firstName + ' ' + lastName, email, senha, cpf, login });
       this.userService.register(user).subscribe(result => {
-        this.authService.login();
-      })
+        console.log(result);
+        this.router.navigateByUrl('/home');
+      });
     }
   }
 

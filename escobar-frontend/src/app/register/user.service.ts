@@ -1,15 +1,22 @@
 import { Injectable } from '@angular/core';
 import { AccountServiceProxy, UserDtoRegister } from 'src/swagger/swag-proxy';
 
+import { AuthenticationService } from '../authentication/authentication.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private userCliente: AccountServiceProxy) {
+  constructor(private accountService: AccountServiceProxy,
+    private authService: AuthenticationService) {
   }
 
   public register(user: UserDtoRegister) {
-    return this.userCliente.register(user);
+    return this.accountService.register(user);
+  }
+
+  getHistory() {
+    return this.accountService.history(this.authService.user.id);
   }
 }

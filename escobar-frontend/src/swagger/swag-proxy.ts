@@ -84,21 +84,19 @@ export class AccountServiceProxy {
     }
 
     /**
-     * @param history (optional) 
+     * @param userID (optional) 
      * @return Success
      */
-    history(history: HistoryDto | null | undefined): Observable<UserAccess[]> {
-        let url_ = this.baseUrl + "/account/history";
+    history(userID: string | null | undefined): Observable<UserAccess[]> {
+        let url_ = this.baseUrl + "/account/history?";
+        if (userID !== undefined)
+            url_ += "UserID=" + encodeURIComponent("" + userID) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(history);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json", 
                 "Accept": "application/json"
             })
         };
@@ -254,54 +252,6 @@ export interface IUser {
     senha: string | undefined;
     senhaHash: string | undefined;
     cpf: string | undefined;
-}
-
-export class HistoryDto implements IHistoryDto {
-    userID!: string | undefined;
-    dateAccess!: moment.Moment | undefined;
-    success!: boolean | undefined;
-    log!: string | undefined;
-
-    constructor(data?: IHistoryDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.userID = data["userID"];
-            this.dateAccess = data["dateAccess"] ? moment(data["dateAccess"].toString()) : <any>undefined;
-            this.success = data["success"];
-            this.log = data["log"];
-        }
-    }
-
-    static fromJS(data: any): HistoryDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new HistoryDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["userID"] = this.userID;
-        data["dateAccess"] = this.dateAccess ? this.dateAccess.toISOString() : <any>undefined;
-        data["success"] = this.success;
-        data["log"] = this.log;
-        return data; 
-    }
-}
-
-export interface IHistoryDto {
-    userID: string | undefined;
-    dateAccess: moment.Moment | undefined;
-    success: boolean | undefined;
-    log: string | undefined;
 }
 
 export class UserAccess implements IUserAccess {
