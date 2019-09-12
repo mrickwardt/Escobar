@@ -1,0 +1,32 @@
+<form fxLayout="row wrap" [formGroup]="registerForm">
+    <h2 fxFlex="100">Registre-se</h2>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Nome" required formControlName="firstName">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Sobrenome" required formControlName="lastName">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="CPF" required formControlName="cpf" mask="000.000.000-00"
+            [dropSpecialCharacters]="true">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Email" required formControlName="email">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Login" required formControlName="login">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Senha" required formControlName="password" type="password">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Confirme sua Senha" required formControlName="confirmPassword" type="password">
+    </mat-form-field>
+    <p *ngIf="registerForm.get('confirmPassword').value &&
+        registerForm.get('password').value !== registerForm.get('confirmPassword').value">
+        As senhas não combinam</p>
+    <div fxFlex="100" fxLayoutAlign="flex-end" style="padding: 0 16px 16px 0">
+        <button fxFlex.xs="100" color="primary" (click)="save()" [disabled]="registerForm.invalid"
+            mat-raised-button>Logar</button>
+    </div>
+</form>

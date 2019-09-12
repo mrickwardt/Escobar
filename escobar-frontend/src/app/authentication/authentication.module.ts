@@ -1,15 +1,21 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RegisterComponent } from './register/register.component';
-import {MatButtonModule} from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { AuthConfig, OAuthModule, OAuthStorage, ValidationHandler, JwksValidationHandler } from 'angular-oauth2-oidc';
+import { authConfig } from './auth.config';
+import { MustBeAdminAuthGuard, MustBeLoggedAuthGuard } from './auth.guard';
 
 @NgModule({
-  declarations: [RegisterComponent],
+  declarations: [],
   imports: [
     CommonModule,
-    FormsModule,
-    MatButtonModule
+    OAuthModule.forRoot()
+  ],
+  providers: [
+    { provide: AuthConfig, useValue: authConfig },
+    { provide: OAuthStorage, useValue: localStorage },
+    { provide: ValidationHandler, useClass: JwksValidationHandler },
+    MustBeLoggedAuthGuard,
+    MustBeAdminAuthGuard
   ]
 })
 export class AuthenticationModule { }
