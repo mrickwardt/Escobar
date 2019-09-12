@@ -1,1 +1,25 @@
-<router-outlet></router-outlet>
+<div fxLayout="column" class="mat-typography">
+    <div id="topbar" fxLayout="row" fxLayoutAlign="space-between center">
+        <div fxLayout="row">
+            <button mat-icon-button (click)="drawer.toggle()">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <h3 id="logo">Escobar</h3>
+        </div>
+        <h6>
+            <button mat-icon-button (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon>
+            </button>
+        </h6>
+    </div>
+    <mat-drawer-container>
+        <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'">
+            <div class="drawer-content">
+                Drawer content
+            </div>
+        </mat-drawer>
+        <mat-drawer-content>
+            <router-outlet></router-outlet>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

@@ -6,8 +6,7 @@ import { NgModule } from '@angular/core';
 @NgModule({
   imports: [HttpClientModule],
   providers: [
-    ServiceProxies.CountryServiceProxy,
-    ServiceProxies.ServiceProxy
+    ServiceProxies.AccountServiceProxy
   ]
 })
 export class SwaggerModule { }

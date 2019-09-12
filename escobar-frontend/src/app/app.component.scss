@@ -1,0 +1,28 @@
+:host ::ng-deep{
+    > div{
+        height: 100%;
+    }
+    #topbar{
+        background: #cacaca;
+        padding: 0 8px;
+        h1,h2,h3,h4,h5,h6,p {
+            margin: 0;
+        }
+        #logo{
+            display: flex;
+            align-items: center;
+        }
+    }
+    mat-drawer-container{
+        display: flex;
+        flex: 1;
+        .drawer-content{
+            padding: 4px;
+        }
+        mat-drawer-content{
+            width: 100%;
+            padding: 8px;
+            overflow: auto;
+        }
+    }
+}
