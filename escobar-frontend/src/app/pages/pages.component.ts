@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserAccess } from 'src/swagger/swag-proxy';
 
-import { AuthenticationService } from '../authentication/authentication.service';
 import { UserService } from '../register/user.service';
 
 @Component({
@@ -10,16 +9,13 @@ import { UserService } from '../register/user.service';
   styleUrls: ['./pages.component.scss']
 })
 export class PagesComponent implements OnInit {
-  history: UserAccess[];
+  historyList: UserAccess[] = [];
 
-  constructor(private authService: AuthenticationService, private userService: UserService) { }
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
-    this.authService.runInitialLoginSequence().then(() => {
-      this.userService.getHistory().subscribe(result => {
-        this.history = result;
-        console.log(this.history);
-      });
+    this.userService.getHistory().subscribe(result => {
+      this.historyList = result;
     });
   }
 

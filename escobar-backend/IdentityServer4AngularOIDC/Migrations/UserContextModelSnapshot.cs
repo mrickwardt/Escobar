@@ -49,7 +49,7 @@ namespace Server.Migrations
 
                     b.Property<string>("Log");
 
-                    b.Property<bool>("Sucess");
+                    b.Property<bool>("Success");
 
                     b.Property<Guid>("UserID");
 

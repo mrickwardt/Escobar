@@ -257,7 +257,7 @@ export interface IUser {
 export class UserAccess implements IUserAccess {
     id!: string | undefined;
     dataAccess!: moment.Moment | undefined;
-    sucess!: boolean | undefined;
+    success!: boolean | undefined;
     userID!: string | undefined;
     log!: string | undefined;
 
@@ -274,7 +274,7 @@ export class UserAccess implements IUserAccess {
         if (data) {
             this.id = data["id"];
             this.dataAccess = data["dataAccess"] ? moment(data["dataAccess"].toString()) : <any>undefined;
-            this.sucess = data["sucess"];
+            this.success = data["success"];
             this.userID = data["userID"];
             this.log = data["log"];
         }
@@ -291,7 +291,7 @@ export class UserAccess implements IUserAccess {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["dataAccess"] = this.dataAccess ? this.dataAccess.toISOString() : <any>undefined;
-        data["sucess"] = this.sucess;
+        data["success"] = this.success;
         data["userID"] = this.userID;
         data["log"] = this.log;
         return data; 
@@ -301,7 +301,7 @@ export class UserAccess implements IUserAccess {
 export interface IUserAccess {
     id: string | undefined;
     dataAccess: moment.Moment | undefined;
-    sucess: boolean | undefined;
+    success: boolean | undefined;
     userID: string | undefined;
     log: string | undefined;
 }

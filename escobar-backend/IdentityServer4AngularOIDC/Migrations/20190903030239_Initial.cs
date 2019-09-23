@@ -13,7 +13,7 @@ namespace Server.Migrations
                 {
                     ID = table.Column<Guid>(nullable: false),
                     DataAccess = table.Column<DateTime>(nullable: false),
-                    Sucess = table.Column<bool>(nullable: false),
+                    Success = table.Column<bool>(nullable: false),
                     UserID = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>

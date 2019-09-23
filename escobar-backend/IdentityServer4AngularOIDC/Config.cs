@@ -34,7 +34,7 @@ namespace Server
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
-                    RedirectUris = { "http://localhost:4200" },
+                    RedirectUris = { "http://localhost:4200/home" },
                     PostLogoutRedirectUris =  { "http://localhost:4200/" },
                     AllowedCorsOrigins = { "http://localhost:4200" },
                     ConsentLifetime = 1800,

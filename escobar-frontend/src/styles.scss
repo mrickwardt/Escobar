@@ -1,11 +1,23 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-html, body{
-    padding: 0;
-    margin: 0;
-    height: 100%;
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
 }
 
-mat-form-field[fxFlex^="100"], mat-form-field[fxFlex^="50"], mat-form-field[fxFlex^="25"]{
-    padding: 0 16px;
+a {
+  &,
+  &:visited,
+  &:hover,
+  &:active {
+    color: #2196f3;
+  }
+}
+
+mat-form-field[fxFlex^="100"],
+mat-form-field[fxFlex^="50"],
+mat-form-field[fxFlex^="25"] {
+  padding: 0 16px;
 }

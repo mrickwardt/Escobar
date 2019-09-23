@@ -31,7 +31,7 @@ namespace Server
             });
             services.AddMvc();
             services
-                .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "CountriesGo", Version = "v1" }));
+                .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Escobar", Version = "v1" }));
             
             // Context
             services.AddDbContext<UserContext>(options => 
@@ -58,7 +58,7 @@ namespace Server
             app.UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "CountriesGo V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Escobar V1");
                     c.RoutePrefix = string.Empty;
                 })
                 .UseMvc();

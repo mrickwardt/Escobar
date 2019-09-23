@@ -1,1 +1,24 @@
 <h3>Histórico</h3>
+<mat-accordion *ngIf="historyList && historyList.length > 0">
+    <mat-expansion-panel *ngFor="let history of historyList">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{history.log + ' - ' + (history.dataAccess | date: 'dd/mm/yyyy')}}
+            </mat-panel-title>
+            <mat-panel-description>
+                <span>Status:&nbsp;</span>
+                <mat-icon class="success" *ngIf="history.success">check_circle</mat-icon>
+                <mat-icon class="error" *ngIf="!history.success">error</mat-icon>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>Tipo: {{history.log}}</p>
+        <p>Data: {{history.dataAccess | date: 'dd/mm/yyyy'}}</p>
+        <p>Hora: {{history.dataAccess | date: 'hh:mm'}}</p>
+        <p class="success_info">
+            Sucesso: {{history.success ? 'Sim' : 'Não'}}
+            <mat-icon class="success" *ngIf="history.success">check_circle</mat-icon>
+            <mat-icon class="error" *ngIf="!history.success">error</mat-icon>
+        </p>
+    </mat-expansion-panel>
+</mat-accordion>
+<h4 *ngIf="!historyList || historyList.length === 0">Sem histórico</h4>

@@ -18,9 +18,9 @@ export class RegisterComponent implements OnInit {
     private userService: UserService,
     private authService: AuthenticationService,
     private router: Router) {
-    // if (this.authService.isLoggedIn()) {
-    //   this.router.navigateByUrl('/home');
-    // }
+    if (this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/home');
+    }
   }
 
   ngOnInit() {
@@ -49,7 +49,6 @@ export class RegisterComponent implements OnInit {
       }
       const user: UserDtoRegister = new UserDtoRegister({ nome: firstName + ' ' + lastName, email, senha, cpf, login });
       this.userService.register(user).subscribe(result => {
-        console.log(result);
         this.router.navigateByUrl('/home');
       });
     }

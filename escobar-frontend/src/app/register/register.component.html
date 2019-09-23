@@ -25,7 +25,8 @@
     <p *ngIf="registerForm.get('confirmPassword').value &&
         registerForm.get('password').value !== registerForm.get('confirmPassword').value">
         As senhas não combinam</p>
-    <div fxFlex="100" fxLayoutAlign="flex-end" style="padding: 0 16px 16px 0">
+    <div fxFlex="100" fxLayoutAlign="flex-end center" style="padding: 0 16px 16px 0">
+        <a style="padding-right:16px;" routerLink="/home">Entrar</a>
         <button fxFlex.xs="100" color="primary" (click)="save()" [disabled]="registerForm.invalid"
             mat-raised-button>Logar</button>
     </div>

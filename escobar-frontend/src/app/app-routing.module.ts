@@ -10,10 +10,9 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule),
-    canActivate: [/*MustBeLoggedAuthGuard*/]
+    loadChildren: () => import('./pages/pages.module').then(m => m.PagesModule)
   },
-  { path: '**', redirectTo: 'home' }
+  { path: '**', redirectTo: 'register' }
 ];
 
 @NgModule({

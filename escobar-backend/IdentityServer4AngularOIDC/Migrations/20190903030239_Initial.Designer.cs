@@ -50,7 +50,7 @@ namespace Server.Migrations
 
                     b.Property<DateTime>("DataAccess");
 
-                    b.Property<bool>("Sucess");
+                    b.Property<bool>("Success");
 
                     b.Property<Guid>("UserID");
 
