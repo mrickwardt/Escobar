@@ -19,4 +19,8 @@ export class UserService {
   getHistory() {
     return this.accountService.history(this.authService.user.id);
   }
+
+  getUser() {
+    return this.accountService.user();
+  }
 }

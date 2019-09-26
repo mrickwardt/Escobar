@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injectable } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,11 +15,31 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { RegisterComponent } from './register/register.component';
+import { EditarComponent } from './editar/editar.component';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AuthenticationService } from './authentication/authentication.service';
+
+
+@Injectable()
+export class TokenInterceptor implements HttpInterceptor {
+  constructor(private auth: AuthenticationService) {}
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    
+    request = request.clone({
+      setHeaders: {
+        Authorization: this.auth.getToken() ? `Bearer ${this.auth.getToken()}` : undefined
+      }
+    });
+    return next.handle(request);
+  }
+}
 
 @NgModule({
   declarations: [
     AppComponent,
-    RegisterComponent
+    RegisterComponent,
+    EditarComponent
   ],
   imports: [
     BrowserModule,

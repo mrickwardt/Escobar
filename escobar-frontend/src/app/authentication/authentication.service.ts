@@ -64,6 +64,9 @@ export class AuthenticationService {
       return this.user;
     }
   }
+  public getToken(){
+    return localStorage.getItem('access_token');
+  }
 
   public login(): void {
     this.oauthService.initImplicitFlow();

@@ -43,5 +43,15 @@ namespace Server.Controllers
             _context.SaveChanges();
             return Task.FromResult(u);
         }
+
+        [HttpPost]
+        [Route("account/user")]
+        public string  GetUsuario()
+        {
+            var email = User.FindFirst("sub")?.Value;
+            //var history = _context.UserAccesses.Where(x => x.UserID === "x").ToList();
+            return "";
+            
+        }
     }
 }
