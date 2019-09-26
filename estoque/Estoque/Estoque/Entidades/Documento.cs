@@ -3,7 +3,6 @@
     public class Documento
     {
         public TipoDocumento Tipo { get; set; }
-
     }
     public enum TipoDocumento
     {

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Estoque.Entidades
 {
@@ -16,8 +13,8 @@ namespace Estoque.Entidades
         public DateTime Data { get; set; }
         public int Quantidade { get; set; }
         public Natureza Natureza { get; set; }
-        public Documento documento { get; set; }
-        public Tipo tipo { get; set; }
+        public Documento Documento { get; set; }
+        public Tipo Tipo { get; set; }
     }
 
     public enum Tipo
