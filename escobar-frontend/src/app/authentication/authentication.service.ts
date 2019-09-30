@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { JwksValidationHandler, OAuthService } from 'angular-oauth2-oidc';
 import jwt_decode from 'jwt-decode';
 import { Observable, Subject } from 'rxjs';
@@ -29,15 +30,20 @@ export class AuthenticationService {
     });
   }
 
-  constructor(private oauthService: OAuthService) {
+  constructor(private oauthService: OAuthService, private router: Router) {
     this.checkValidAccessToken();
     this.oauthService.tokenValidationHandler = new JwksValidationHandler();
     this.getUser();
   }
 
   public runInitialLoginSequence(): Promise<boolean> {
-    return this.oauthService.loadDiscoveryDocumentAndLogin()
+    debugger
+    return this.oauthService.loadDiscoveryDocumentAndTryLogin()
       .then((isLoadingFinished) => {
+        if (!this.oauthService.hasValidAccessToken()) {
+          this.router.navigateByUrl('/user/register');
+        }
+
         return isLoadingFinished;
       })
       .catch(() => {
@@ -64,7 +70,7 @@ export class AuthenticationService {
       return this.user;
     }
   }
-  public getToken(){
+  public getToken() {
     return localStorage.getItem('access_token');
   }
 

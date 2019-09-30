@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Server.DTOs
+﻿namespace Server.DTOs
 {
     public class HistoryDto
     {

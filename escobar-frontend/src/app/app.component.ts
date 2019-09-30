@@ -1,6 +1,5 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { AuthenticationService } from './authentication/authentication.service';
 
@@ -12,7 +11,7 @@ import { AuthenticationService } from './authentication/authentication.service';
 export class AppComponent {
   mobileQuery: MediaQueryList;
 
-  constructor(private router: Router, media: MediaMatcher, public auth: AuthenticationService) {
+  constructor(media: MediaMatcher, public auth: AuthenticationService) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
   }
   logout() {

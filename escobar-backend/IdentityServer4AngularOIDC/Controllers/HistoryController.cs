@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Server.Controllers
 {
     [ApiController]
+    [Route("[controller]/[action]")]
     public class HistoryController : ControllerBase
     {
         private readonly UserContext _context;
@@ -19,8 +20,7 @@ namespace Server.Controllers
         }
 
         [HttpGet]
-        [Route("account/history")]
-        public Task<List<UserAccess>> History([FromQuery] HistoryDto history)
+        public Task<List<UserAccess>> UserHistory([FromQuery] HistoryDto history)
         {
             //return history;
             var userInDb = _context.UserAccesses.FirstOrDefault(x => x.UserID == Guid.Parse(history.UserID));

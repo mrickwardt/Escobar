@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserDtoRegister } from 'src/swagger/swag-proxy';
+import { UserRegisterDto } from 'src/swagger/swag-proxy';
 
-import { AuthenticationService } from '../authentication/authentication.service';
+import { AuthenticationService } from '../../../authentication/authentication.service';
 import { UserService } from './user.service';
 
 @Component({
@@ -47,11 +47,15 @@ export class RegisterComponent implements OnInit {
       if (senha !== confirmPassword) {
         return;
       }
-      const user: UserDtoRegister = new UserDtoRegister({ nome: firstName + ' ' + lastName, email, senha, cpf, login });
+      const user: UserRegisterDto = new UserRegisterDto({ nome: firstName + ' ' + lastName, email, senha, cpf, login });
       this.userService.register(user).subscribe(result => {
-        this.router.navigateByUrl('/home');
+        this.login();
       });
     }
+  }
+
+  login() {
+    this.authService.login();
   }
 
 }

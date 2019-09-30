@@ -28,14 +28,14 @@ export class AccountServiceProxy {
     }
 
     /**
-     * @param user (optional) 
+     * @param userRegisterEdit (optional) 
      * @return Success
      */
-    register(user: UserDtoRegister | null | undefined): Observable<User> {
-        let url_ = this.baseUrl + "/account/register";
+    register(userRegisterEdit: UserRegisterDto | null | undefined): Observable<User> {
+        let url_ = this.baseUrl + "/Account/Register";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(user);
+        const content_ = JSON.stringify(userRegisterEdit);
 
         let options_ : any = {
             body: content_,
@@ -86,8 +86,8 @@ export class AccountServiceProxy {
     /**
      * @return Success
      */
-    user(): Observable<string> {
-        let url_ = this.baseUrl + "/account/user";
+    get(): Observable<UserOutputDto> {
+        let url_ = this.baseUrl + "/Account/Get";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -99,20 +99,20 @@ export class AccountServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUser(response_);
+            return this.processGet(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUser(<any>response_);
+                    return this.processGet(<any>response_);
                 } catch (e) {
-                    return <Observable<string>><any>_observableThrow(e);
+                    return <Observable<UserOutputDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<string>><any>_observableThrow(response_);
+                return <Observable<UserOutputDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processUser(response: HttpResponseBase): Observable<string> {
+    protected processGet(response: HttpResponseBase): Observable<UserOutputDto> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -123,7 +123,7 @@ export class AccountServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            result200 = UserOutputDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -131,15 +131,83 @@ export class AccountServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<string>(<any>null);
+        return _observableOf<UserOutputDto>(<any>null);
+    }
+
+    /**
+     * @param editUser (optional) 
+     * @return Success
+     */
+    edit(editUser: UserEditDto | null | undefined): Observable<UserOutputDto> {
+        let url_ = this.baseUrl + "/Account/Edit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(editUser);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processEdit(<any>response_);
+                } catch (e) {
+                    return <Observable<UserOutputDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UserOutputDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processEdit(response: HttpResponseBase): Observable<UserOutputDto> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserOutputDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UserOutputDto>(<any>null);
+    }
+}
+
+@Injectable()
+export class HistoryServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
     }
 
     /**
      * @param userID (optional) 
      * @return Success
      */
-    history(userID: string | null | undefined): Observable<UserAccess[]> {
-        let url_ = this.baseUrl + "/account/history?";
+    userHistory(userID: string | null | undefined): Observable<UserAccess[]> {
+        let url_ = this.baseUrl + "/History/UserHistory?";
         if (userID !== undefined)
             url_ += "UserID=" + encodeURIComponent("" + userID) + "&"; 
         url_ = url_.replace(/[?&]$/, "");
@@ -153,11 +221,11 @@ export class AccountServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processHistory(response_);
+            return this.processUserHistory(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processHistory(<any>response_);
+                    return this.processUserHistory(<any>response_);
                 } catch (e) {
                     return <Observable<UserAccess[]>><any>_observableThrow(e);
                 }
@@ -166,7 +234,7 @@ export class AccountServiceProxy {
         }));
     }
 
-    protected processHistory(response: HttpResponseBase): Observable<UserAccess[]> {
+    protected processUserHistory(response: HttpResponseBase): Observable<UserAccess[]> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -193,14 +261,14 @@ export class AccountServiceProxy {
     }
 }
 
-export class UserDtoRegister implements IUserDtoRegister {
+export class UserRegisterDto implements IUserRegisterDto {
     nome!: string | undefined;
     email!: string | undefined;
     login!: string | undefined;
     senha!: string | undefined;
     cpf!: string | undefined;
 
-    constructor(data?: IUserDtoRegister) {
+    constructor(data?: IUserRegisterDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -219,9 +287,9 @@ export class UserDtoRegister implements IUserDtoRegister {
         }
     }
 
-    static fromJS(data: any): UserDtoRegister {
+    static fromJS(data: any): UserRegisterDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserDtoRegister();
+        let result = new UserRegisterDto();
         result.init(data);
         return result;
     }
@@ -237,7 +305,7 @@ export class UserDtoRegister implements IUserDtoRegister {
     }
 }
 
-export interface IUserDtoRegister {
+export interface IUserRegisterDto {
     nome: string | undefined;
     email: string | undefined;
     login: string | undefined;
@@ -302,6 +370,114 @@ export interface IUser {
     login: string | undefined;
     senha: string | undefined;
     senhaHash: string | undefined;
+    cpf: string | undefined;
+}
+
+export class UserOutputDto implements IUserOutputDto {
+    id!: string | undefined;
+    nome!: string | undefined;
+    email!: string | undefined;
+    login!: string | undefined;
+    cpf!: string | undefined;
+
+    constructor(data?: IUserOutputDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.id = data["id"];
+            this.nome = data["nome"];
+            this.email = data["email"];
+            this.login = data["login"];
+            this.cpf = data["cpf"];
+        }
+    }
+
+    static fromJS(data: any): UserOutputDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserOutputDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["nome"] = this.nome;
+        data["email"] = this.email;
+        data["login"] = this.login;
+        data["cpf"] = this.cpf;
+        return data; 
+    }
+}
+
+export interface IUserOutputDto {
+    id: string | undefined;
+    nome: string | undefined;
+    email: string | undefined;
+    login: string | undefined;
+    cpf: string | undefined;
+}
+
+export class UserEditDto implements IUserEditDto {
+    nome!: string | undefined;
+    email!: string | undefined;
+    login!: string | undefined;
+    senhaAntiga!: string | undefined;
+    senha!: string | undefined;
+    cpf!: string | undefined;
+
+    constructor(data?: IUserEditDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.nome = data["nome"];
+            this.email = data["email"];
+            this.login = data["login"];
+            this.senhaAntiga = data["senhaAntiga"];
+            this.senha = data["senha"];
+            this.cpf = data["cpf"];
+        }
+    }
+
+    static fromJS(data: any): UserEditDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserEditDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["nome"] = this.nome;
+        data["email"] = this.email;
+        data["login"] = this.login;
+        data["senhaAntiga"] = this.senhaAntiga;
+        data["senha"] = this.senha;
+        data["cpf"] = this.cpf;
+        return data; 
+    }
+}
+
+export interface IUserEditDto {
+    nome: string | undefined;
+    email: string | undefined;
+    login: string | undefined;
+    senhaAntiga: string | undefined;
+    senha: string | undefined;
     cpf: string | undefined;
 }
 

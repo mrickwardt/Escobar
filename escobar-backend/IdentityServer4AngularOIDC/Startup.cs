@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Quickstart.UI.Profile;
+﻿using AutoMapper;
+using IdentityServer4.Quickstart.UI.Profile;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +31,7 @@ namespace Server
                     .AllowCredentials());
             });
             services.AddMvc();
-            services
+            services.AddAutoMapper(typeof(Startup))
                 .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Escobar", Version = "v1" }));
             
             // Context
@@ -52,7 +53,6 @@ namespace Server
             {
                 app.UseCors("Devlopment");
                 app.UseDeveloperExceptionPage();
-                
             }
             
             app.UseSwagger()

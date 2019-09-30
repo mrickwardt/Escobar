@@ -1,4 +1,4 @@
-<form fxLayout="row wrap" [formGroup]="registerForm">
+<form *ngIf="registerForm" fxLayout="row wrap" [formGroup]="registerForm">
     <h2 fxFlex="100">Editar dados</h2>
     <mat-form-field fxFlex="100" fxFlex.gt-md="50">
         <input matInput placeholder="Nome" required formControlName="firstName">
@@ -9,6 +9,9 @@
     <mat-form-field fxFlex="100" fxFlex.gt-md="50">
         <input matInput placeholder="CPF" required formControlName="cpf" mask="000.000.000-00"
             [dropSpecialCharacters]="true">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Login" required formControlName="login">
     </mat-form-field>
     <mat-form-field fxFlex="100" fxFlex.gt-md="50">
         <input matInput placeholder="Email" required formControlName="email">
@@ -28,6 +31,11 @@
     <p fxFlex="100" *ngIf="registerForm.get('oldPassword').value &&
         registerForm.get('newPassword').value === registerForm.get('oldPassword').value">
         As senhas antiga e nova não podem ser iguais!</p>
+    <p fxFlex="100" *ngIf="passwordFailedRequirements">
+        Os campos de Senha são obrigatórios e devem ter no mínimo 6 caracteres</p>
+    <p fxFlex="100" *ngIf="errorEditing">
+        Senha antiga incorreta 🤭</p>
+
     <div fxFlex="100" fxLayoutAlign="flex-end center" style="padding: 0 16px 16px 0">
         <a style="padding-right:16px;" routerLink="/home">Cancelar</a>
         <button fxFlex.xs="100" color="primary" (click)="save()" [disabled]="registerForm.invalid"

@@ -7,7 +7,7 @@
             <h3 id="logo">Escobar</h3>
         </div>
         <div *ngIf="auth.user && auth.user.name">
-            <span>{{auth.user.name}}</span>
+            <a routerLink="/user/edit">{{auth.user.name}}</a>
             <button mat-icon-button (click)="logout()">
                 <mat-icon>exit_to_app</mat-icon>
             </button>

@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+
 import { AuthenticationService } from './authentication.service';
 
 
 @Injectable()
 export class MustBeLoggedAuthGuard implements CanActivate {
-  constructor(private authService: AuthenticationService) { }
+  constructor(private authService: AuthenticationService, private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    return this.authService.hasValidToken();
+    const isLogged = this.authService.hasValidToken();
+    if (!isLogged) {
+      this.router.navigateByUrl('/user/register');
+    }
+    return isLogged;
   }
 }
 
@@ -19,4 +24,4 @@ export class MustBeAdminAuthGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.authService.hasValidAdminToken();
   }
-} 
+}

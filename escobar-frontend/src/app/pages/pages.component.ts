@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserAccess } from 'src/swagger/swag-proxy';
 
-import { UserService } from '../register/user.service';
+import { UserService } from './user/register/user.service';
 
 @Component({
   selector: 'app-pages',

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Server.Models;
+using Server.Shared;
 
 namespace IdentityServer4.Quickstart.UI
 {
@@ -110,12 +111,24 @@ namespace IdentityServer4.Quickstart.UI
                 // validate username/password against in-memory store
                 if (userInDb != null && model.Password == userInDb.Senha)
                 {
-                    var access = new UserAccess(DateTime.Now, true, userInDb.ID, "Login");
+                    var lastAccess = _userContext.UserAccesses
+                        .Where(x => x.Success && x.Log == UserEvents.Login || x.Log == UserEvents.Logout)
+                        .OrderByDescending(x => x.DataAccess)
+                        .FirstOrDefault(x => x.UserID == userInDb.ID);
+                    if (lastAccess != null && lastAccess.Log == UserEvents.Login)
+                    {
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Usuário já está logado em outro dispositivo"));
+                        ModelState.AddModelError("", "Usuário já está logado em outro dispositivo");
+                        var accessFailed = new UserAccess(DateTime.Now, false, userInDb.ID, UserEvents.AlreadyLogged);
+                        _userContext.UserAccesses.Add(accessFailed);
+                        _userContext.SaveChanges();
+                        return View(await BuildLoginViewModelAsync(model));
+                    }
+                    var access = new UserAccess(DateTime.Now, true, userInDb.ID, UserEvents.Login);
                     _userContext.UserAccesses.Add(access);
                     _userContext.SaveChanges();
                     await _events.RaiseAsync(new UserLoginSuccessEvent(userInDb.Nome, userInDb.ID.ToString(), userInDb.Email));
                     
-
                     // only set explicit expiration here if user chooses "remember me". 
                     // otherwise we rely upon expiration configured in cookie middleware.
                     AuthenticationProperties props = null;
@@ -155,26 +168,20 @@ namespace IdentityServer4.Quickstart.UI
                     {
                         return Redirect(model.ReturnUrl);
                     }
-                    else if (string.IsNullOrEmpty(model.ReturnUrl))
+                    if (string.IsNullOrEmpty(model.ReturnUrl))
                     {
                         return Redirect("~/");
                     }
-                    else
-                    {
-                        // user might have clicked on a malicious link - should be logged
-                        throw new Exception("invalid return URL");
-                    }
+                    // user might have clicked on a malicious link - should be logged
+                    throw new Exception("invalid return URL");
                 }
-                else
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
+                ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
+                if (userInDb != null)
                 {
-                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
-                    ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
-                    if (userInDb != null)
-                    {
-                        var access = new UserAccess(DateTime.Now, false, userInDb.ID, "Login");
-                        _userContext.UserAccesses.Add(access);
-                        _userContext.SaveChanges();
-                    }
+                    var access = new UserAccess(DateTime.Now, false, userInDb.ID, UserEvents.Login);
+                    _userContext.UserAccesses.Add(access);
+                    _userContext.SaveChanges();
                 }
             }
 
@@ -216,7 +223,7 @@ namespace IdentityServer4.Quickstart.UI
             if (User?.Identity.IsAuthenticated == true)
             {
                 var userId = Guid.Parse(User.Identity.GetSubjectId());
-                var log = ("Logout");
+                var log = UserEvents.Logout;
                 var access = new UserAccess(DateTime.Now, true, userId, log);
                 _userContext.UserAccesses.Add(access);
                 _userContext.SaveChanges();

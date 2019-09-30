@@ -3,7 +3,7 @@
     <mat-expansion-panel *ngFor="let history of historyList">
         <mat-expansion-panel-header>
             <mat-panel-title>
-                {{history.log + ' - ' + (history.dataAccess | date: 'dd/mm/yyyy')}}
+                {{history.log + ' - ' + (history.dataAccess | date: 'dd/MM/yyyy')}}
             </mat-panel-title>
             <mat-panel-description>
                 <span>Status:&nbsp;</span>
@@ -12,7 +12,7 @@
             </mat-panel-description>
         </mat-expansion-panel-header>
         <p>Tipo: {{history.log}}</p>
-        <p>Data: {{history.dataAccess | date: 'dd/mm/yyyy'}}</p>
+        <p>Data: {{history.dataAccess | date: 'dd/MM/yyyy'}}</p>
         <p>Hora: {{history.dataAccess | date: 'hh:mm'}}</p>
         <p class="success_info">
             Sucesso: {{history.success ? 'Sim' : 'Não'}}
