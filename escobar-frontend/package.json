@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "nswag-update": "./node_modules/.bin/nswag run ./src/swagger/config.nswag"
+    "nswag-update": "./node_modules/.bin/nswag run ./src/swagger/config.nswag",
+    "nswag-estoque-update": "./node_modules/.bin/nswag run ./src/swagger-estoque/config.nswag"
   },
   "private": true,
   "dependencies": {
