@@ -90,6 +90,34 @@ namespace Estoque.Controllers
             {
                 return BadRequest(ModelState);
             }
+            var inv = _context.Inventario.FirstOrDefault(x => x.produtoId == movimento.ProdutoId);
+            var invQnt = inv.quantidade;
+            if (inv == null && movimento.Tipo == Tipo.eAquisicao || movimento.Tipo == Tipo.eDevolucao || movimento.Tipo == Tipo.eFabricação)
+            {
+                _context.Inventario.Add(new Inventario
+                {
+                    id = new Guid(),
+                    produtoId = movimento.ProdutoId,
+                    quantidade = invQnt + movimento.Quantidade
+                });
+            }
+            else if (inv == null && movimento.Tipo == Tipo.sConsumo || movimento.Tipo == Tipo.sDevolucao || movimento.Tipo == Tipo.sOrdem || movimento.Tipo == Tipo.sVenda)
+            {
+                if (invQnt > movimento.Quantidade)
+                {
+                    _context.Inventario.Add(new Inventario
+                    {
+                        id = new Guid(),
+                        produtoId = movimento.ProdutoId,
+                        quantidade = invQnt - movimento.Quantidade
+                    });
+                }
+                throw new Exception("Não há produtos suficientes no inventario para ser retirado");
+            }
+            else
+            {
+                throw new Exception("Não há produto em estoque");
+            }
 
             _context.Movimento.Add(movimento);
             await _context.SaveChangesAsync();

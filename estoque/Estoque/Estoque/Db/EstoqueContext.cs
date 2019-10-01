@@ -21,6 +21,7 @@ namespace Estoque.Db
         public DbSet<Estoque.Entidades.Movimento> Movimento { get; set; }
 
         public DbSet<Estoque.Entidades.Filial> Filial { get; set; }
+        public DbSet<Estoque.Entidades.Inventario> Inventario { get; set; }
     }
 
 }
