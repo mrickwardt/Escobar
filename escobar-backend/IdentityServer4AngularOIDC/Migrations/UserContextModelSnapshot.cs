@@ -86,24 +86,7 @@ namespace Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ComandoId");
-
-                    b.HasIndex("UserId");
-
                     b.ToTable("UserComandos");
-                });
-
-            modelBuilder.Entity("Server.Models.UserComandos", b =>
-                {
-                    b.HasOne("Server.Models.Comando", "Comando")
-                        .WithMany()
-                        .HasForeignKey("ComandoId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Server.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
