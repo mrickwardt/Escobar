@@ -27,7 +27,7 @@ namespace Estoque
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Escobar", Version = "v1" }));
+                .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Estoque", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,7 +41,7 @@ namespace Estoque
             app.UseSwagger()
                 .UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Escobar V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Estoque v1");
                     c.RoutePrefix = string.Empty;
                 })
                 .UseMvc();
