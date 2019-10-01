@@ -14,6 +14,8 @@ namespace Server.Models
 
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Comando> Comandos { get; set; }
+        public DbSet<UserComandos> UserComandos { get; set; }
         public DbSet<UserAccess> UserAccesses { get; set; }
     }
 
