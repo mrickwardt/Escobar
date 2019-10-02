@@ -8,6 +8,24 @@
     <mat-form-field fxFlex="100" fxFlex.gt-md="50">
         <input matInput placeholder="Nome" required formControlName="name">
     </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Rua" required formControlName="enderecoRua">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Bairro" required formControlName="enderecoBairro">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Cidade" required formControlName="enderecoCidade">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Número" required formControlName="enderecoNúmero">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="CEP" required formControlName="enderecoCEP">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Contato" required formControlName="contato">
+    </mat-form-field>
     <div fxFlex="100" fxLayoutAlign="flex-end center" style="padding: 0 16px 16px 0">
         <button fxFlex="100" color="primary" (click)="save()" [disabled]="form.invalid"
             mat-raised-button>Editar</button>
