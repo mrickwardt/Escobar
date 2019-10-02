@@ -9,11 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DepositoComponent } from './deposito.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { EditComponent } from './edit/edit.component';
 
 
 
 @NgModule({
-  declarations: [CreateComponent, DepositoComponent],
+  declarations: [CreateComponent, DepositoComponent, EditComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -10,9 +10,10 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatDividerModule} from '@angular/material/divider';
 import { MovimentoComponent } from './movimento.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import { EditComponent } from './edit/edit.component';
 
 @NgModule({
-  declarations: [CreateComponent, MovimentoComponent],
+  declarations: [CreateComponent, MovimentoComponent, EditComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -1,0 +1,33 @@
+<form fxLayout="row wrap" [formGroup]="form" *ngIf="form">
+    <h2 fxFlex="100">Edição de Produto</h2>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input matInput placeholder="Nome" required formControlName="name">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input type="number" matInput placeholder="Quantidade" required formControlName="quantidade">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <input type="number" matInput placeholder="Valor" required formControlName="valor">
+    </mat-form-field>
+    <mat-form-field fxFlex="100" fxFlex.gt-md="50">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="tipo">
+            <mat-option [value]="0">
+                Materia Prima
+            </mat-option>
+            <mat-option [value]="1">
+                Semi Acabado
+            </mat-option>
+            <mat-option [value]="2">
+                Acabado
+            </mat-option>
+            <mat-option [value]="3">
+                Consumo
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div fxFlex="100" fxLayoutAlign="flex-end center" style="padding: 0 16px 16px 0">
+        <button fxFlex="100" color="primary" (click)="save()" [disabled]="form.invalid"
+            mat-raised-button>Cadastrar</button>
+    </div>
+</form>

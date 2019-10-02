@@ -11,9 +11,10 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ProdutoRoutingModule } from './produto-routing.module';
 import { ProdutoComponent } from './produto.component';
 import {MatTabsModule} from '@angular/material/tabs';
+import { EditComponent } from './edit/edit.component';
 
 @NgModule({
-  declarations: [CreateComponent, ProdutoComponent],
+  declarations: [CreateComponent, ProdutoComponent, EditComponent],
   imports: [
     CommonModule,
     MatSelectModule,
