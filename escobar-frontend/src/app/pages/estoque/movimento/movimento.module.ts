@@ -11,6 +11,7 @@ import {MatDividerModule} from '@angular/material/divider';
 import { MovimentoComponent } from './movimento.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { EditComponent } from './edit/edit.component';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [CreateComponent, MovimentoComponent, EditComponent],
@@ -22,6 +23,7 @@ import { EditComponent } from './edit/edit.component';
     MatInputModule,
     MatIconModule,
     MatTabsModule,
+    MatTableModule,
     FlexLayoutModule,
     MovimentoRoutingModule
   ]

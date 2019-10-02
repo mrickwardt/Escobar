@@ -10,6 +10,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { DepositoComponent } from './deposito.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { EditComponent } from './edit/edit.component';
+import { MatTableModule } from '@angular/material/table';
 
 
 
@@ -21,6 +22,7 @@ import { EditComponent } from './edit/edit.component';
     FormsModule,
     MatButtonModule,
     MatTabsModule,
+    MatTableModule,
     MatInputModule,
     MatIconModule,
     FlexLayoutModule,

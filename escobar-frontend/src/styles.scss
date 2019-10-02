@@ -22,3 +22,20 @@ mat-form-field[fxFlex^="50"],
 mat-form-field[fxFlex^="25"] {
   padding: 0 16px;
 }
+
+.masterdetail-table{
+  width: 100%;
+  td{
+    cursor: pointer;
+  }
+}
+.masterdetail-close{
+  &,
+  &:visited,
+  &:hover,
+  &:active {
+    user-select: none;
+    text-decoration: none;
+    color: #000;
+  }
+}

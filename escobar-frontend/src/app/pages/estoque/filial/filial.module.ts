@@ -10,6 +10,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FilialComponent } from './filial.component';
 import { EditComponent } from './edit/edit.component';
+import { MatTableModule } from '@angular/material/table';
 
 
 
@@ -23,6 +24,7 @@ import { EditComponent } from './edit/edit.component';
     MatInputModule,
     MatTabsModule,
     MatIconModule,
+    MatTableModule,
     FlexLayoutModule,
     FilialRoutingModule
   ]
