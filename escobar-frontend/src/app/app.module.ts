@@ -15,6 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { AuthenticationService } from './authentication/authentication.service';
+import { MatDivider, MatDividerModule } from '@angular/material/divider';
 
 
 @Injectable()
@@ -41,6 +42,7 @@ export class TokenInterceptor implements HttpInterceptor {
     MatListModule,
     MatButtonModule,
     MatIconModule,
+    MatDividerModule,
     FlexLayoutModule,
 
     AppRoutingModule
