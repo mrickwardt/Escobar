@@ -7,7 +7,8 @@
             <h3 id="logo">Escobar</h3>
         </div>
         <div *ngIf="auth.user && auth.user.name">
-            <a routerLink="/user/edit">{{auth.user.name}}</a>
+            <a routerLink="/estoque/user/edit">{{auth.user.name}}
+            </a>
             <button mat-icon-button (click)="logout()">
                 <mat-icon>exit_to_app</mat-icon>
             </button>
@@ -16,7 +17,38 @@
     <mat-drawer-container>
         <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'">
             <div class="drawer-content">
-                Drawer content
+                <mat-list class="list-sidenav" role="list">
+                    <mat-list-item role="listitem">
+                        <a routerLink="/home">
+                            <mat-icon>home</mat-icon>
+                            Home
+                        </a>
+                    </mat-list-item>
+                    <mat-list-item role="listitem">
+                        <a routerLink="/estoque/produto">
+                            <mat-icon>shopping_cart</mat-icon>
+                            Produto
+                        </a>
+                    </mat-list-item>
+                    <mat-list-item role="listitem">
+                        <a routerLink="/estoque/deposito">
+                            <mat-icon>monetization_on</mat-icon>
+                            Depósito
+                        </a>
+                    </mat-list-item>
+                    <mat-list-item role="listitem">
+                        <a routerLink="/estoque/movimento">
+                            <mat-icon>compare_arrows</mat-icon>
+                            Movimento
+                        </a>
+                    </mat-list-item>
+                    <mat-list-item role="listitem">
+                        <a routerLink="/estoque/filial">
+                            <mat-icon>store_mall_directory</mat-icon>
+                            Filial
+                        </a>
+                    </mat-list-item>
+                </mat-list>
             </div>
         </mat-drawer>
         <mat-drawer-content>

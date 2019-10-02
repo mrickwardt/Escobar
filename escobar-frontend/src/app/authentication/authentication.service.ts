@@ -37,7 +37,6 @@ export class AuthenticationService {
   }
 
   public runInitialLoginSequence(): Promise<boolean> {
-    debugger
     return this.oauthService.loadDiscoveryDocumentAndTryLogin()
       .then((isLoadingFinished) => {
         if (!this.oauthService.hasValidAccessToken()) {

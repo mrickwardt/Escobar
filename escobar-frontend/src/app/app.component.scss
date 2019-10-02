@@ -18,6 +18,15 @@
         flex: 1;
         .drawer-content{
             padding: 4px;
+            .list-sidenav a{
+                display: flex;
+                align-items: center;
+                place-content: space-between;
+                text-decoration: none;
+                mat-icon {
+                    margin-right: 8px;
+                }
+            }
         }
         mat-drawer-content{
             width: 100%;

@@ -9,6 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from 'src/swagger/swag-proxy';
 import { SwaggerModule } from 'src/swagger/swagger-module';
+import {MatListModule} from '@angular/material/list';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -37,6 +38,7 @@ export class TokenInterceptor implements HttpInterceptor {
     AuthenticationModule,
     SwaggerModule,
     MatSidenavModule,
+    MatListModule,
     MatButtonModule,
     MatIconModule,
     FlexLayoutModule,

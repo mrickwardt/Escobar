@@ -6,10 +6,10 @@ namespace Estoque.Entidades
     public class Produto
     {
         public Guid Id { get; set; }
+        public string Nome { get; set; }
         public int Quantidade { get; set; }
         public double Valor { get; set; }
-        public string Nome { get; set; }
-        public string Tipo { get; set; }
+        public TipoProduto Tipo { get; set; }
         public List<Movimento> Movimento { get; set; }
 
     }

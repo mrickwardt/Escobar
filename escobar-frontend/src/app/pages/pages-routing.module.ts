@@ -10,6 +10,10 @@ const routes: Routes = [
     loadChildren: () => import('./user/user.module').then(m => m.UserModule)
   },
   {
+    path: 'estoque',
+    loadChildren: () => import('./estoque/estoque.module').then(m => m.EstoqueModule)
+  },
+  {
     path: '',
     component: PagesComponent,
     canActivate: [MustBeLoggedAuthGuard]

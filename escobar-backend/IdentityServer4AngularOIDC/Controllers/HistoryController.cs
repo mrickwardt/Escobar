@@ -22,7 +22,10 @@ namespace Server.Controllers
         [HttpGet]
         public Task<List<UserAccess>> UserHistory([FromQuery] HistoryDto history)
         {
-            //return history;
+            if(history.UserID == null)
+            {
+                return Task.FromResult(new List<UserAccess>());
+            }
             var userInDb = _context.UserAccesses.FirstOrDefault(x => x.UserID == Guid.Parse(history.UserID));
             if (userInDb == null) return null;
             var accesses = _context.UserAccesses.Where(x => x.UserID == Guid.Parse(history.UserID)).ToList();
