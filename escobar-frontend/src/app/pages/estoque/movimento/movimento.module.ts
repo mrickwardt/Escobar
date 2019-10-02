@@ -12,6 +12,7 @@ import { MovimentoComponent } from './movimento.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { EditComponent } from './edit/edit.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [CreateComponent, MovimentoComponent, EditComponent],
@@ -23,6 +24,7 @@ import { MatTableModule } from '@angular/material/table';
     MatInputModule,
     MatIconModule,
     MatTabsModule,
+    MatSelectModule,
     MatTableModule,
     FlexLayoutModule,
     MovimentoRoutingModule

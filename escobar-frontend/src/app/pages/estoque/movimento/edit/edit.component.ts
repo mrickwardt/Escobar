@@ -31,6 +31,8 @@ export class EditComponent implements OnInit {
   ngOnInit() {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
+      quantidade: [1, Validators.required],
+      tipo: [0, Validators.required],
     });
   }
 

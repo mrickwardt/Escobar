@@ -15,7 +15,7 @@ export class CreateComponent implements OnInit {
   ngOnInit() {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
-      quantidade: ['', Validators.required],
+      quantidade: [1, Validators.required],
       valor: ['', Validators.required],
       tipo: ['', Validators.required]
     });
