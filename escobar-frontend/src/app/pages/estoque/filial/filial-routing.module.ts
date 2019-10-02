@@ -17,7 +17,7 @@ const routes: Routes = [
         path: 'edit',
         component: EditComponent
       },
-      { path: '**', redirectTo: 'create' }
+      { path: '**', redirectTo: 'edit' }
     ]
   },
   { path: '**', redirectTo: '' }

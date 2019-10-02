@@ -8,13 +8,14 @@ import { Component, OnInit } from '@angular/core';
 export class FilialComponent implements OnInit {
   navLinks = [
     {
-      label: 'Cadastrar',
-      link: './first',
-      index: 0
-    }, {
-      label: 'Editar',
+      label: 'Visualizar',
       link: './edit',
       index: 1
+    },
+    {
+      label: 'Cadastrar',
+      link: './create',
+      index: 0
     }
   ];
 
