@@ -11,7 +11,7 @@
     <input #inputFile type="file" hidden>
     <button fxFlex.xs="100" color="primary" (click)="inputFile.click()" [disabled]="form.invalid"
         mat-raised-button>Anexar documento</button>
-    <div fxFlex="100" fxLayoutAlign="flex-end center" style="padding: 0 16px 16px 0">
+    <div fxFlex="100" fxLayoutAlign="flex-end center" style="margin-top: 8px; padding: 0 16px 16px 0">
         <button fxFlex="100" color="primary" (click)="save()" [disabled]="form.invalid"
             mat-raised-button>Cadastrar</button>
     </div>

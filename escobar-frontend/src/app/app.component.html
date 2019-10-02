@@ -4,7 +4,7 @@
             <button mat-icon-button (click)="drawer.toggle()">
                 <mat-icon>menu</mat-icon>
             </button>
-            <h3 id="logo">Escobar</h3>
+            <h3 id="logo">App Estoque</h3>
         </div>
         <div *ngIf="auth.user && auth.user.name">
             <a routerLink="/estoque/user/edit">{{auth.user.name}}
