@@ -4,7 +4,6 @@ using Estoque.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Estoque.Migrations
 {
@@ -19,7 +18,7 @@ namespace Estoque.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Estoque.Entidades.Deposito", b =>
+            modelBuilder.Entity("Estoque.Entidades.Depositos", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -28,7 +27,7 @@ namespace Estoque.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Deposito");
+                    b.ToTable("Depositos");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Documento", b =>
@@ -43,7 +42,7 @@ namespace Estoque.Migrations
                     b.ToTable("Documento");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Filial", b =>
+            modelBuilder.Entity("Estoque.Entidades.Filiais", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -54,10 +53,10 @@ namespace Estoque.Migrations
 
                     b.HasIndex("DepositoId");
 
-                    b.ToTable("Filial");
+                    b.ToTable("Filiais");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Inventario", b =>
+            modelBuilder.Entity("Estoque.Entidades.Inventarios", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd();
@@ -68,10 +67,10 @@ namespace Estoque.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Inventario");
+                    b.ToTable("Inventarios");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Movimento", b =>
+            modelBuilder.Entity("Estoque.Entidades.Movimentacoes", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -94,7 +93,7 @@ namespace Estoque.Migrations
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("Movimento");
+                    b.ToTable("Movimentacoes");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Produto", b =>
@@ -110,7 +109,7 @@ namespace Estoque.Migrations
 
                     b.Property<string>("Tipo");
 
-                    b.Property<double>("Valor");
+                    b.Property<double>("ValorBase");
 
                     b.HasKey("Id");
 
@@ -119,28 +118,28 @@ namespace Estoque.Migrations
                     b.ToTable("Produtos");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Filial", b =>
+            modelBuilder.Entity("Estoque.Entidades.Filiais", b =>
                 {
-                    b.HasOne("Estoque.Entidades.Deposito")
-                        .WithMany("Inventario")
+                    b.HasOne("Estoque.Entidades.Depositos")
+                        .WithMany("Inventarios")
                         .HasForeignKey("DepositoId");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Movimento", b =>
+            modelBuilder.Entity("Estoque.Entidades.Movimentacoes", b =>
                 {
                     b.HasOne("Estoque.Entidades.Documento", "Documento")
                         .WithMany()
                         .HasForeignKey("DocumentoId");
 
                     b.HasOne("Estoque.Entidades.Produto")
-                        .WithMany("Movimento")
+                        .WithMany("Movimentacoes")
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Produto", b =>
                 {
-                    b.HasOne("Estoque.Entidades.Deposito")
+                    b.HasOne("Estoque.Entidades.Depositos")
                         .WithMany("Produto")
                         .HasForeignKey("DepositoId");
                 });

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
@@ -25,7 +24,7 @@ namespace Estoque.Controllers
         [HttpGet]
         public IEnumerable<Filial> GetFilial()
         {
-            return _context.Filial;
+            return _context.Filiais;
         }
 
         // GET: api/Filiais/5
@@ -37,7 +36,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var filial = await _context.Filial.FindAsync(id);
+            var filial = await _context.Filiais.FindAsync(id);
 
             if (filial == null)
             {
@@ -91,7 +90,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.Filial.Add(filial);
+            _context.Filiais.Add(filial);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFilial", new { id = filial.Id }, filial);
@@ -106,13 +105,13 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var filial = await _context.Filial.FindAsync(id);
+            var filial = await _context.Filiais.FindAsync(id);
             if (filial == null)
             {
                 return NotFound();
             }
 
-            _context.Filial.Remove(filial);
+            _context.Filiais.Remove(filial);
             await _context.SaveChangesAsync();
 
             return Ok(filial);
@@ -120,7 +119,7 @@ namespace Estoque.Controllers
 
         private bool FilialExists(Guid id)
         {
-            return _context.Filial.Any(e => e.Id == id);
+            return _context.Filiais.Any(e => e.Id == id);
         }
     }
 }

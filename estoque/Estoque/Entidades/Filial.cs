@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Estoque.Entidades
 {
@@ -6,5 +7,6 @@ namespace Estoque.Entidades
     {
         public Guid Id { get; set; }
         public string Nome { get; set; }
+        public List<Deposito> Depositos { get; set; }
     }
 }

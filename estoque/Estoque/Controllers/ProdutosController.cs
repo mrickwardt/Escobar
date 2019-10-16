@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -15,10 +16,13 @@ namespace Estoque.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
+        
 
-        public ProdutosController(EstoqueContext context)
+        public ProdutosController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Produtos
@@ -84,17 +88,17 @@ namespace Estoque.Controllers
 
         // POST: api/Produtos
         [HttpPost]
-        public async Task<IActionResult> PostProduto([FromBody] Produto produto)
+        public async Task<ProdutoOutput> PostProduto([FromBody] ProdutoInput produtoInput)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return null;
             }
+            var produto = new Produto(produtoInput.Nome, produtoInput.Quantidade, produtoInput.ValorBase, produtoInput.Tipo, 0);
 
             _context.Produtos.Add(produto);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduto", new { id = produto.Id }, produto);
+            return _mapper.Map<ProdutoOutput>(produto);
         }
 
         // DELETE: api/Produtos/5

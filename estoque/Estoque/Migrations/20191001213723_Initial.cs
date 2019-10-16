@@ -8,7 +8,7 @@ namespace Estoque.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Deposito",
+                name: "Depositos",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -32,7 +32,7 @@ namespace Estoque.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Inventario",
+                name: "Inventarios",
                 columns: table => new
                 {
                     id = table.Column<Guid>(nullable: false),
@@ -45,7 +45,7 @@ namespace Estoque.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Filial",
+                name: "Filiais",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -57,7 +57,7 @@ namespace Estoque.Migrations
                     table.ForeignKey(
                         name: "FK_Filial_Deposito_DepositoId",
                         column: x => x.DepositoId,
-                        principalTable: "Deposito",
+                        principalTable: "Depositos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -79,13 +79,13 @@ namespace Estoque.Migrations
                     table.ForeignKey(
                         name: "FK_Produtos_Deposito_DepositoId",
                         column: x => x.DepositoId,
-                        principalTable: "Deposito",
+                        principalTable: "Depositos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Movimento",
+                name: "Movimentacoes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -115,17 +115,17 @@ namespace Estoque.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Filial_DepositoId",
-                table: "Filial",
+                table: "Filiais",
                 column: "DepositoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movimento_DocumentoId",
-                table: "Movimento",
+                table: "Movimentacoes",
                 column: "DocumentoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movimento_ProdutoId",
-                table: "Movimento",
+                table: "Movimentacoes",
                 column: "ProdutoId");
 
             migrationBuilder.CreateIndex(
@@ -137,13 +137,13 @@ namespace Estoque.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Filial");
+                name: "Filiais");
 
             migrationBuilder.DropTable(
-                name: "Inventario");
+                name: "Inventarios");
 
             migrationBuilder.DropTable(
-                name: "Movimento");
+                name: "Movimentacoes");
 
             migrationBuilder.DropTable(
                 name: "Documento");
@@ -152,7 +152,7 @@ namespace Estoque.Migrations
                 name: "Produtos");
 
             migrationBuilder.DropTable(
-                name: "Deposito");
+                name: "Depositos");
         }
     }
 }

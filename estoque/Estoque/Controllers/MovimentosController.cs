@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
@@ -25,7 +24,7 @@ namespace Estoque.Controllers
         [HttpGet]
         public IEnumerable<Movimento> GetMovimento()
         {
-            return _context.Movimento;
+            return _context.Movimentacoes;
         }
 
         // GET: api/Movimentos/5
@@ -37,7 +36,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var movimento = await _context.Movimento.FindAsync(id);
+            var movimento = await _context.Movimentacoes.FindAsync(id);
 
             if (movimento == null)
             {
@@ -90,11 +89,11 @@ namespace Estoque.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var inv = _context.Inventario.FirstOrDefault(x => x.produtoId == movimento.ProdutoId);
+            var inv = _context.Inventarios.FirstOrDefault(x => x.produtoId == movimento.ProdutoId);
             var invQnt = inv.quantidade;
             if (inv == null && movimento.Tipo == Tipo.eAquisicao || movimento.Tipo == Tipo.eDevolucao || movimento.Tipo == Tipo.eFabricação)
             {
-                _context.Inventario.Add(new Inventario
+                _context.Inventarios.Add(new Inventario
                 {
                     id = new Guid(),
                     produtoId = movimento.ProdutoId,
@@ -105,7 +104,7 @@ namespace Estoque.Controllers
             {
                 if (invQnt > movimento.Quantidade)
                 {
-                    _context.Inventario.Add(new Inventario
+                    _context.Inventarios.Add(new Inventario
                     {
                         id = new Guid(),
                         produtoId = movimento.ProdutoId,
@@ -119,7 +118,7 @@ namespace Estoque.Controllers
                 throw new Exception("Não há produto em estoque");
             }
 
-            _context.Movimento.Add(movimento);
+            _context.Movimentacoes.Add(movimento);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetMovimento", new { id = movimento.Id }, movimento);
@@ -134,13 +133,13 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var movimento = await _context.Movimento.FindAsync(id);
+            var movimento = await _context.Movimentacoes.FindAsync(id);
             if (movimento == null)
             {
                 return NotFound();
             }
 
-            _context.Movimento.Remove(movimento);
+            _context.Movimentacoes.Remove(movimento);
             await _context.SaveChangesAsync();
 
             return Ok(movimento);
@@ -148,7 +147,7 @@ namespace Estoque.Controllers
 
         private bool MovimentoExists(Guid id)
         {
-            return _context.Movimento.Any(e => e.Id == id);
+            return _context.Movimentacoes.Any(e => e.Id == id);
         }
     }
 }

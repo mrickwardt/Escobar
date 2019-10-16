@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
@@ -25,7 +24,7 @@ namespace Estoque.Controllers
         [HttpGet]
         public IEnumerable<Deposito> GetDeposito()
         {
-            return _context.Deposito;
+            return _context.Depositos;
         }
 
         // GET: api/Depositos/5
@@ -37,7 +36,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var deposito = await _context.Deposito.FindAsync(id);
+            var deposito = await _context.Depositos.FindAsync(id);
 
             if (deposito == null)
             {
@@ -91,7 +90,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.Deposito.Add(deposito);
+            _context.Depositos.Add(deposito);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetDeposito", new { id = deposito.Id }, deposito);
@@ -106,13 +105,13 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var deposito = await _context.Deposito.FindAsync(id);
+            var deposito = await _context.Depositos.FindAsync(id);
             if (deposito == null)
             {
                 return NotFound();
             }
 
-            _context.Deposito.Remove(deposito);
+            _context.Depositos.Remove(deposito);
             await _context.SaveChangesAsync();
 
             return Ok(deposito);
@@ -120,7 +119,7 @@ namespace Estoque.Controllers
 
         private bool DepositoExists(Guid id)
         {
-            return _context.Deposito.Any(e => e.Id == id);
+            return _context.Depositos.Any(e => e.Id == id);
         }
     }
 }
