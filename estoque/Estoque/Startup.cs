@@ -27,7 +27,7 @@ namespace Estoque
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<EstoqueContext>(options =>
+            services.AddDbContext<EstoqueContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services

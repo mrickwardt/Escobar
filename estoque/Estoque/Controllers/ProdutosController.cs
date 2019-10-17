@@ -94,6 +94,12 @@ namespace Estoque.Controllers
             {
                 return null;
             }
+
+            var produtoInDb = _context.Produtos.FirstOrDefault(p => p.Nome == produtoInput.Nome);
+            if (produtoInDb != null)
+            {
+                return _mapper.Map<ProdutoOutput>(produtoInDb);
+            }
             var produto = new Produto(produtoInput.Nome, produtoInput.Quantidade, produtoInput.ValorBase, produtoInput.Tipo, 0);
 
             _context.Produtos.Add(produto);
