@@ -90,6 +90,8 @@ namespace Estoque.Migrations
 
                     b.Property<int>("Tipo");
 
+                    b.Property<double>("Valor");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentoId");

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191017125552_Initial")]
+    [Migration("20191019225612_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,6 +91,8 @@ namespace Estoque.Migrations
                     b.Property<int>("Quantidade");
 
                     b.Property<int>("Tipo");
+
+                    b.Property<double>("Valor");
 
                     b.HasKey("Id");
 

@@ -68,14 +68,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!FilialExists(id))
+                if (!FilialExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -117,7 +114,7 @@ namespace Estoque.Controllers
             return Ok(filial);
         }
 
-        private bool FilialExists(Guid id)
+        private bool FilialExiste(Guid id)
         {
             return _context.Filiais.Any(e => e.Id == id);
         }

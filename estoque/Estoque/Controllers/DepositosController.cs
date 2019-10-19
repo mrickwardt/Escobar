@@ -68,14 +68,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DepositoExists(id))
+                if (!DepositoExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -117,7 +114,7 @@ namespace Estoque.Controllers
             return Ok(deposito);
         }
 
-        private bool DepositoExists(Guid id)
+        private bool DepositoExiste(Guid id)
         {
             return _context.Depositos.Any(e => e.Id == id);
         }

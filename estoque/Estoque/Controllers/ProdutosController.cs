@@ -73,14 +73,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProdutoExists(id))
+                if (!ProdutoExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -109,7 +106,7 @@ namespace Estoque.Controllers
 
         // DELETE: api/Produtos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduto([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarProduto([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -128,7 +125,7 @@ namespace Estoque.Controllers
             return Ok(produto);
         }
 
-        private bool ProdutoExists(Guid id)
+        private bool ProdutoExiste(Guid id)
         {
             return _context.Produtos.Any(e => e.Id == id);
         }

@@ -93,6 +93,7 @@ namespace Estoque.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     Data = table.Column<DateTime>(nullable: false),
                     Quantidade = table.Column<int>(nullable: false),
+                    Valor = table.Column<double>(nullable: false),
                     Natureza = table.Column<int>(nullable: false),
                     DocumentoId = table.Column<Guid>(nullable: true),
                     Tipo = table.Column<int>(nullable: false),
