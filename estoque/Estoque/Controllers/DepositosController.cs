@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -14,10 +16,12 @@ namespace Estoque.Controllers
     public class DepositosController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
 
-        public DepositosController(EstoqueContext context)
+        public DepositosController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Depositos
@@ -80,12 +84,23 @@ namespace Estoque.Controllers
 
         // POST: api/Depositos
         [HttpPost]
-        public async Task<IActionResult> PostDeposito([FromBody] Deposito deposito)
+        public async Task<IActionResult> PostDeposito([FromBody] DepositoInput depositoInput)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var filialVinculada = _context.Filiais.Find(depositoInput.IdFilialVinculada);
+
+            if (filialVinculada == null){
+                return NotFound();
+            }
+
+            var deposito = _mapper.Map<Deposito>(depositoInput);
+            deposito.FilialId = depositoInput.IdFilialVinculada;
+            deposito.FilialVinculada = filialVinculada;
+            deposito.DataHora = DateTime.Now;
 
             _context.Depositos.Add(deposito);
             await _context.SaveChangesAsync();

@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191019225612_Initial")]
-    partial class Initial
+    [Migration("20191022010504_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
+                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -29,6 +29,8 @@ namespace Estoque.Migrations
                     b.Property<DateTime>("DataHora");
 
                     b.Property<Guid>("FilialId");
+
+                    b.Property<string>("Nome");
 
                     b.HasKey("Id");
 

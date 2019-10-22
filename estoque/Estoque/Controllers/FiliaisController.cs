@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -14,10 +16,12 @@ namespace Estoque.Controllers
     public class FiliaisController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
 
-        public FiliaisController(EstoqueContext context)
+        public FiliaisController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Filiais
@@ -80,14 +84,21 @@ namespace Estoque.Controllers
 
         // POST: api/Filiais
         [HttpPost]
-        public async Task<IActionResult> PostFilial([FromBody] Filial filial)
+        public async Task<IActionResult> PostFilial([FromBody] FilialInput filialInput )
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return null;
             }
 
-            _context.Filiais.Add(filial);
+            var filialInDb = _context.Filiais.FirstOrDefault(f => f.Nome == filialInput.Nome);
+
+            if (filialInDb != null){
+                return BadRequest("Filial já existe com esse nome!");
+            }
+
+            var filial = _mapper.Map<Filial>(filialInput);
+            await _context.Filiais.AddAsync(filial);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFilial", new { id = filial.Id }, filial);

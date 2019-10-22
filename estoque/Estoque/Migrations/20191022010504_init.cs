@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Estoque.Migrations
 {
-    public partial class Initial : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -49,6 +49,7 @@ namespace Estoque.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    Nome = table.Column<string>(nullable: true),
                     DataHora = table.Column<DateTime>(nullable: false),
                     FilialId = table.Column<Guid>(nullable: false)
                 },

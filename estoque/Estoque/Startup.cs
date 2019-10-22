@@ -39,6 +39,8 @@ namespace Estoque
                 mc.AddProfile(new MappingProfile());
                 mc.CreateMap<Produto, ProdutoOutput>();
                 mc.CreateMap<MovimentoInput, Movimento>();
+                mc.CreateMap<FilialInput, Filial>();
+                mc.CreateMap<DepositoInput, Deposito>();
             });
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
