@@ -13,7 +13,6 @@ namespace Estoque.Db
         public DbSet<Movimento> Movimentacoes { get; set; }
 
         public DbSet<Filial> Filiais { get; set; }
-        public DbSet<Inventario> Inventarios { get; set; }
     }
 
 }

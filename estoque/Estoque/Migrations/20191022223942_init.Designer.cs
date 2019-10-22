@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191022010504_init")]
+    [Migration("20191022223942_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,20 +61,6 @@ namespace Estoque.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Filiais");
-                });
-
-            modelBuilder.Entity("Estoque.Entidades.Inventario", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("produtoId");
-
-                    b.Property<int>("quantidade");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Inventarios");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Movimento", b =>

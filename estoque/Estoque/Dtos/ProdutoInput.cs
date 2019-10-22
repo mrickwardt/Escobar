@@ -1,4 +1,5 @@
 ﻿using Estoque.Dtos.Enums;
+using System;
 
 namespace Estoque.Dtos
 {
@@ -8,5 +9,6 @@ namespace Estoque.Dtos
         public int Quantidade { get; set; }
         public TipoProduto Tipo { get; set; }
         public double ValorBase { get; set; }
+        public Guid DepositoVinculadoId { get; set; }
     }
 }

@@ -125,6 +125,22 @@ namespace Estoque.Controllers
             return Ok(filial);
         }
 
+        // GET: api/Filiais/Depositos/5
+        [HttpGet]
+        [Route("{id}/Depositos")]
+        public async Task<List<Deposito>> GetDepositos([FromRoute] Guid id)
+        {
+            var filial = await _context.Filiais
+                .Include(x => x.Depositos)
+                .Select(x => new { x.Id, x.Depositos })
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (filial == null)
+            {
+                return null;
+            }
+            return filial.Depositos;
+        }
         private bool FilialExiste(Guid id)
         {
             return _context.Filiais.Any(e => e.Id == id);

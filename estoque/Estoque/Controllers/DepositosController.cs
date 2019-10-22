@@ -91,18 +91,26 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var filialVinculada = _context.Filiais.Find(depositoInput.IdFilialVinculada);
+            var filialVinculada = _context.Filiais.Find(depositoInput.FilialVinculadaId);
 
             if (filialVinculada == null){
-                return NotFound();
+                return BadRequest("Filial não existe");
             }
 
             var deposito = _mapper.Map<Deposito>(depositoInput);
-            deposito.FilialId = depositoInput.IdFilialVinculada;
+            deposito.FilialId = depositoInput.FilialVinculadaId;
             deposito.FilialVinculada = filialVinculada;
             deposito.DataHora = DateTime.Now;
 
             _context.Depositos.Add(deposito);
+
+            if (filialVinculada.Depositos == null)
+            {
+                filialVinculada.Depositos = new List<Deposito>();
+            }
+            filialVinculada.Depositos.Add(deposito);
+            _context.Filiais.Update(filialVinculada);
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetDeposito", new { id = deposito.Id }, deposito);
@@ -127,6 +135,24 @@ namespace Estoque.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(deposito);
+        }
+
+        // GET: api/Filiais/Produtos/5
+        [HttpGet]
+        [Route("{id}/Produtos")]
+        public async Task<List<Produto>> GetProdutos([FromRoute] Guid id)
+        {
+            var deposito = await _context.Depositos
+                .Include(x => x.Produtos)
+                .Select(x => new { x.Id, x.Produtos })
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (deposito == null)
+            {
+                return null;
+            }
+
+            return deposito.Produtos;
         }
 
         private bool DepositoExiste(Guid id)

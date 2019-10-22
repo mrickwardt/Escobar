@@ -32,19 +32,6 @@ namespace Estoque.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Inventarios",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(nullable: false),
-                    produtoId = table.Column<Guid>(nullable: false),
-                    quantidade = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Inventarios", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Depositos",
                 columns: table => new
                 {
@@ -140,9 +127,6 @@ namespace Estoque.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Inventarios");
-
             migrationBuilder.DropTable(
                 name: "Movimentacoes");
 

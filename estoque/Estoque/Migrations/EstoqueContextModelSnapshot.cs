@@ -61,20 +61,6 @@ namespace Estoque.Migrations
                     b.ToTable("Filiais");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Inventario", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("produtoId");
-
-                    b.Property<int>("quantidade");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Inventarios");
-                });
-
             modelBuilder.Entity("Estoque.Entidades.Movimento", b =>
                 {
                     b.Property<Guid>("Id")

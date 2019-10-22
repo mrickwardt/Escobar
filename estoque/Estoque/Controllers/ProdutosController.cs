@@ -97,9 +97,23 @@ namespace Estoque.Controllers
             {
                 return _mapper.Map<ProdutoOutput>(produtoInDb);
             }
+            var depositoInDb = _context.Depositos.Find(produtoInput.DepositoVinculadoId);
+            if (depositoInDb == null)
+            {
+                return null;
+                // return BadRequest("Depósito vinculado não encontrado");
+            }
             var produto = new Produto(produtoInput.Nome, produtoInput.Quantidade, produtoInput.ValorBase, produtoInput.Tipo, 0);
 
             _context.Produtos.Add(produto);
+
+            if(depositoInDb.Produtos == null)
+            {
+                depositoInDb.Produtos = new List<Produto>();
+            }
+            depositoInDb.Produtos.Add(produto);
+            _context.Depositos.Update(depositoInDb);
+
             await _context.SaveChangesAsync();
             return _mapper.Map<ProdutoOutput>(produto);
         }

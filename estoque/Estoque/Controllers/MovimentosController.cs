@@ -161,6 +161,21 @@ namespace Estoque.Controllers
             return Ok(movimento);
         }
 
+        // GET: api/Movimentos/5
+        [HttpGet]
+        [Route("ProdutoVinculado/{id}")]
+        public async Task<List<Movimento>> GetMovimentoPorProdutoVinculado([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return null;
+            }
+
+            var listaMovimentacao = _context.Movimentacoes.Where(m => m.ProdutoId == id).ToListAsync();
+
+            return await listaMovimentacao;
+        }
+
         private bool MovimentoExiste(Guid id)
         {
             return _context.Movimentacoes.Any(e => e.Id == id);
