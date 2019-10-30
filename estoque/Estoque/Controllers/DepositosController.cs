@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -15,17 +16,19 @@ namespace Estoque.Controllers
     public class DepositosController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
 
-        public DepositosController(EstoqueContext context)
+        public DepositosController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Depositos
         [HttpGet]
         public IEnumerable<Deposito> GetDeposito()
         {
-            return _context.Deposito;
+            return _context.Depositos;
         }
 
         // GET: api/Depositos/5
@@ -37,7 +40,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var deposito = await _context.Deposito.FindAsync(id);
+            var deposito = await _context.Depositos.FindAsync(id);
 
             if (deposito == null)
             {
@@ -69,14 +72,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!DepositoExists(id))
+                if (!DepositoExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -84,14 +84,33 @@ namespace Estoque.Controllers
 
         // POST: api/Depositos
         [HttpPost]
-        public async Task<IActionResult> PostDeposito([FromBody] Deposito deposito)
+        public async Task<IActionResult> PostDeposito([FromBody] DepositoInput depositoInput)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _context.Deposito.Add(deposito);
+            var filialVinculada = _context.Filiais.Find(depositoInput.FilialVinculadaId);
+
+            if (filialVinculada == null){
+                return BadRequest("Filial não existe");
+            }
+
+            var deposito = _mapper.Map<Deposito>(depositoInput);
+            deposito.FilialId = depositoInput.FilialVinculadaId;
+            deposito.FilialVinculada = filialVinculada;
+            deposito.DataHora = DateTime.Now;
+
+            _context.Depositos.Add(deposito);
+
+            if (filialVinculada.Depositos == null)
+            {
+                filialVinculada.Depositos = new List<Deposito>();
+            }
+            filialVinculada.Depositos.Add(deposito);
+            _context.Filiais.Update(filialVinculada);
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetDeposito", new { id = deposito.Id }, deposito);
@@ -106,21 +125,39 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var deposito = await _context.Deposito.FindAsync(id);
+            var deposito = await _context.Depositos.FindAsync(id);
             if (deposito == null)
             {
                 return NotFound();
             }
 
-            _context.Deposito.Remove(deposito);
+            _context.Depositos.Remove(deposito);
             await _context.SaveChangesAsync();
 
             return Ok(deposito);
         }
 
-        private bool DepositoExists(Guid id)
+        // GET: api/Filiais/Produtos/5
+        [HttpGet]
+        [Route("{id}/Produtos")]
+        public async Task<List<Produto>> GetProdutos([FromRoute] Guid id)
         {
-            return _context.Deposito.Any(e => e.Id == id);
+            var deposito = await _context.Depositos
+                .Include(x => x.Produtos)
+                .Select(x => new { x.Id, x.Produtos })
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (deposito == null)
+            {
+                return null;
+            }
+
+            return deposito.Produtos;
+        }
+
+        private bool DepositoExiste(Guid id)
+        {
+            return _context.Depositos.Any(e => e.Id == id);
         }
     }
 }

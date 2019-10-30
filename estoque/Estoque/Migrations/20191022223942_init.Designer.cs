@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191001213723_Initial")]
-    partial class Initial
+    [Migration("20191022223942_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,9 +28,15 @@ namespace Estoque.Migrations
 
                     b.Property<DateTime>("DataHora");
 
+                    b.Property<Guid>("FilialId");
+
+                    b.Property<string>("Nome");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Deposito");
+                    b.HasIndex("FilialId");
+
+                    b.ToTable("Depositos");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Documento", b =>
@@ -50,27 +56,11 @@ namespace Estoque.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("DepositoId");
+                    b.Property<string>("Nome");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepositoId");
-
-                    b.ToTable("Filial");
-                });
-
-            modelBuilder.Entity("Estoque.Entidades.Inventario", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<Guid>("produtoId");
-
-                    b.Property<int>("quantidade");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Inventario");
+                    b.ToTable("Filiais");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Movimento", b =>
@@ -90,13 +80,15 @@ namespace Estoque.Migrations
 
                     b.Property<int>("Tipo");
 
+                    b.Property<double>("Valor");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentoId");
 
                     b.HasIndex("ProdutoId");
 
-                    b.ToTable("Movimento");
+                    b.ToTable("Movimentacoes");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Produto", b =>
@@ -108,11 +100,13 @@ namespace Estoque.Migrations
 
                     b.Property<string>("Nome");
 
+                    b.Property<double>("PrecoMedio");
+
                     b.Property<int>("Quantidade");
 
-                    b.Property<string>("Tipo");
+                    b.Property<int>("Tipo");
 
-                    b.Property<double>("Valor");
+                    b.Property<double>("ValorBase");
 
                     b.HasKey("Id");
 
@@ -121,11 +115,12 @@ namespace Estoque.Migrations
                     b.ToTable("Produtos");
                 });
 
-            modelBuilder.Entity("Estoque.Entidades.Filial", b =>
+            modelBuilder.Entity("Estoque.Entidades.Deposito", b =>
                 {
-                    b.HasOne("Estoque.Entidades.Deposito")
-                        .WithMany("Inventario")
-                        .HasForeignKey("DepositoId");
+                    b.HasOne("Estoque.Entidades.Filial", "FilialVinculada")
+                        .WithMany("Depositos")
+                        .HasForeignKey("FilialId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Movimento", b =>
@@ -134,8 +129,8 @@ namespace Estoque.Migrations
                         .WithMany()
                         .HasForeignKey("DocumentoId");
 
-                    b.HasOne("Estoque.Entidades.Produto")
-                        .WithMany("Movimento")
+                    b.HasOne("Estoque.Entidades.Produto", "ProdutoVinculado")
+                        .WithMany()
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -143,7 +138,7 @@ namespace Estoque.Migrations
             modelBuilder.Entity("Estoque.Entidades.Produto", b =>
                 {
                     b.HasOne("Estoque.Entidades.Deposito")
-                        .WithMany("Produto")
+                        .WithMany("Produtos")
                         .HasForeignKey("DepositoId");
                 });
 #pragma warning restore 612, 618

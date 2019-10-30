@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -15,17 +16,19 @@ namespace Estoque.Controllers
     public class FiliaisController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
 
-        public FiliaisController(EstoqueContext context)
+        public FiliaisController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Filiais
         [HttpGet]
         public IEnumerable<Filial> GetFilial()
         {
-            return _context.Filial;
+            return _context.Filiais;
         }
 
         // GET: api/Filiais/5
@@ -37,7 +40,7 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var filial = await _context.Filial.FindAsync(id);
+            var filial = await _context.Filiais.FindAsync(id);
 
             if (filial == null)
             {
@@ -69,14 +72,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!FilialExists(id))
+                if (!FilialExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -84,14 +84,21 @@ namespace Estoque.Controllers
 
         // POST: api/Filiais
         [HttpPost]
-        public async Task<IActionResult> PostFilial([FromBody] Filial filial)
+        public async Task<IActionResult> PostFilial([FromBody] FilialInput filialInput )
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return null;
             }
 
-            _context.Filial.Add(filial);
+            var filialInDb = _context.Filiais.FirstOrDefault(f => f.Nome == filialInput.Nome);
+
+            if (filialInDb != null){
+                return BadRequest("Filial já existe com esse nome!");
+            }
+
+            var filial = _mapper.Map<Filial>(filialInput);
+            await _context.Filiais.AddAsync(filial);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFilial", new { id = filial.Id }, filial);
@@ -106,21 +113,37 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
-            var filial = await _context.Filial.FindAsync(id);
+            var filial = await _context.Filiais.FindAsync(id);
             if (filial == null)
             {
                 return NotFound();
             }
 
-            _context.Filial.Remove(filial);
+            _context.Filiais.Remove(filial);
             await _context.SaveChangesAsync();
 
             return Ok(filial);
         }
 
-        private bool FilialExists(Guid id)
+        // GET: api/Filiais/Depositos/5
+        [HttpGet]
+        [Route("{id}/Depositos")]
+        public async Task<List<Deposito>> GetDepositos([FromRoute] Guid id)
         {
-            return _context.Filial.Any(e => e.Id == id);
+            var filial = await _context.Filiais
+                .Include(x => x.Depositos)
+                .Select(x => new { x.Id, x.Depositos })
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (filial == null)
+            {
+                return null;
+            }
+            return filial.Depositos;
+        }
+        private bool FilialExiste(Guid id)
+        {
+            return _context.Filiais.Any(e => e.Id == id);
         }
     }
 }

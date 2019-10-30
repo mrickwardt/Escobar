@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
+using Estoque.Dtos;
 using Estoque.Entidades;
 
 namespace Estoque.Controllers
@@ -15,10 +16,13 @@ namespace Estoque.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly EstoqueContext _context;
+        private readonly IMapper _mapper;
+        
 
-        public ProdutosController(EstoqueContext context)
+        public ProdutosController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Produtos
@@ -69,14 +73,11 @@ namespace Estoque.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProdutoExists(id))
+                if (!ProdutoExiste(id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -84,22 +85,42 @@ namespace Estoque.Controllers
 
         // POST: api/Produtos
         [HttpPost]
-        public async Task<IActionResult> PostProduto([FromBody] Produto produto)
+        public async Task<ProdutoOutput> PostProduto([FromBody] ProdutoInput produtoInput)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return null;
             }
 
-            _context.Produtos.Add(produto);
-            await _context.SaveChangesAsync();
+            var produtoInDb = _context.Produtos.FirstOrDefault(p => p.Nome == produtoInput.Nome);
+            if (produtoInDb != null)
+            {
+                return _mapper.Map<ProdutoOutput>(produtoInDb);
+            }
+            var depositoInDb = _context.Depositos.Find(produtoInput.DepositoVinculadoId);
+            if (depositoInDb == null)
+            {
+                return null;
+                // return BadRequest("Depósito vinculado não encontrado");
+            }
+            var produto = new Produto(produtoInput.Nome, produtoInput.Quantidade, produtoInput.ValorBase, produtoInput.Tipo, 0);
 
-            return CreatedAtAction("GetProduto", new { id = produto.Id }, produto);
+            _context.Produtos.Add(produto);
+
+            if(depositoInDb.Produtos == null)
+            {
+                depositoInDb.Produtos = new List<Produto>();
+            }
+            depositoInDb.Produtos.Add(produto);
+            _context.Depositos.Update(depositoInDb);
+
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ProdutoOutput>(produto);
         }
 
         // DELETE: api/Produtos/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduto([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarProduto([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -118,7 +139,7 @@ namespace Estoque.Controllers
             return Ok(produto);
         }
 
-        private bool ProdutoExists(Guid id)
+        private bool ProdutoExiste(Guid id)
         {
             return _context.Produtos.Any(e => e.Id == id);
         }

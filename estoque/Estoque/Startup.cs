@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using Estoque.Db;
+using Estoque.Dtos;
+using Estoque.Entidades;
+using Estoque.Mappers;
 
 namespace Estoque
 {
@@ -23,11 +27,23 @@ namespace Estoque
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddDbContext<EstoqueContext>(options =>
+            services.AddDbContext<EstoqueContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services
                 .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Estoque", Version = "v1" }));
+            
+            // AutoMapper
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+                mc.CreateMap<Produto, ProdutoOutput>();
+                mc.CreateMap<MovimentoInput, Movimento>();
+                mc.CreateMap<FilialInput, Filial>();
+                mc.CreateMap<DepositoInput, Deposito>();
+            });
+            var mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
