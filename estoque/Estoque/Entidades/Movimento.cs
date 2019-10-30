@@ -8,13 +8,14 @@ namespace Estoque.Entidades
         public Guid Id { get; set; }
         public DateTime Data { get; set; }
         public int Quantidade { get; set; }
-        public double Valor{ get; set; }
+        public double Valor { get; set; }
         public Natureza Natureza { get; set; }
         public Documento Documento { get; set; }
         public Tipo Tipo { get; set; }
         public Guid ProdutoId { get; set; }
         public Produto ProdutoVinculado { get; set; }
         public Guid TituloContaId { get; set; }
+        public Evento Evento { get; set; }
     }
 
     public enum Tipo

@@ -2,6 +2,10 @@
 {
     public enum TituloContasSituacao
     {
-        Aberto, Liquidado, Cancelado
+        Aberto,
+        LiquidadoParcial,
+        LiquidadoIntegral,
+        LiquidadoPorSubstituicao,
+        Cancelado
     }
 }

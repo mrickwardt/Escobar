@@ -130,14 +130,15 @@ namespace Estoque.Controllers
             {
                 return BadRequest("Titulo não encontrado!");
             }
-            if (titulo.ValorTitulo < input.Valor)
+            if (titulo.Saldo < input.Valor)
             {
                 return BadRequest("Valor maior que o do titulo!");
             }
-            titulo.ValorTitulo -= input.Valor;
-            if (titulo.ValorTitulo == 0)
+            titulo.Saldo -= input.Valor;
+            titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoParcial;
+            if (titulo.Saldo == 0)
             {
-                titulo.Situacao = Dtos.Enums.TituloContasSituacao.Liquidado;
+                titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoIntegral;
             }
             _context.TituloContas.Update(titulo);
             await _context.SaveChangesAsync();
@@ -156,11 +157,11 @@ namespace Estoque.Controllers
             {
                 return BadRequest("Titulo não encontrado!");
             }
-            if (titulo.ValorTitulo < input.Valor)
+            if (titulo.Saldo < input.Valor)
             {
                 return BadRequest("Valor maior que o do titulo!");
             }
-            titulo.ValorTitulo -= input.Valor;
+            titulo.Saldo -= input.Valor;
             _context.TituloContas.Update(titulo);
             await _context.SaveChangesAsync();
             return Ok(titulo);
