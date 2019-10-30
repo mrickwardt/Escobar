@@ -14,6 +14,7 @@ namespace Estoque.Entidades
         public Tipo Tipo { get; set; }
         public Guid ProdutoId { get; set; }
         public Produto ProdutoVinculado { get; set; }
+        public Guid TituloContaId { get; set; }
     }
 
     public enum Tipo
