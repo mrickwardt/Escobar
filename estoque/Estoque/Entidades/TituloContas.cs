@@ -12,6 +12,7 @@ namespace Estoque.Entidades
         public TituloContas Substituto { get; set; }
         public TituloTipoPagamento TipoPagamento { get; set; }
         public DateTime Data { get; set; }
+        public Guid MovimentacaoId { get; set; }
 
     }
 }

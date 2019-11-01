@@ -92,6 +92,21 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
+            tituloContas.Situacao = Dtos.Enums.TituloContasSituacao.Aberto;
+            Movimento movimento = new Movimento();
+            movimento.Data = DateTime.Now;
+            movimento.Documento = new Documento();
+            movimento.Documento.Tipo = TipoDocumento.Fiscal;
+            movimento.Natureza = Natureza.dev;
+            //movimento.ProdutoId = tituloContas.
+            // movimento.Quantidade = tituloContas.q
+            movimento.Tipo = Tipo.sVenda;
+            movimento.TituloContaId = tituloContas.Id;
+            movimento.Evento = new Evento();
+
+
+
+            _context.Movimentacoes.Add(movimento);
             _context.TituloContas.Add(tituloContas);
             await _context.SaveChangesAsync();
 

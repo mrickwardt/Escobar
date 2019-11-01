@@ -97,7 +97,7 @@ namespace Estoque.Controllers
                 return BadRequest("Produto vinculado não encontrado");
             }
 
-            if ((int) input.Tipo >= 2 && produtoVinculado.Quantidade < input.Quantidade)
+            if ((int)input.Tipo >= 2 && produtoVinculado.Quantidade < input.Quantidade)
             {
                 return BadRequest(
                     "A quantidade do produto " + produtoVinculado.Nome + " é menor que a solicitada");
@@ -106,10 +106,11 @@ namespace Estoque.Controllers
             var movimento = _mapper.Map<Movimento>(input);
             movimento.ProdutoVinculado = produtoVinculado;
             movimento.ProdutoId = produtoVinculado.Id;
-            if ((int) input.Tipo >= 2)
+            if ((int)input.Tipo >= 2)
             {
                 // Saída
                 produtoVinculado.Quantidade -= input.Quantidade;
+
             }
             else
             {
@@ -118,7 +119,7 @@ namespace Estoque.Controllers
             }
 
             var movimentacoesAnteriores = _context.Movimentacoes
-                .Where(m => m.ProdutoId == input.ProdutoVinculadoId && ((int) m.Tipo == 3 || (int) m.Tipo == 4 || (int) m.Tipo == 5))
+                .Where(m => m.ProdutoId == input.ProdutoVinculadoId && ((int)m.Tipo == 3 || (int)m.Tipo == 4 || (int)m.Tipo == 5))
                 .Select(m => new
                 {
                     m.Quantidade,
@@ -126,7 +127,7 @@ namespace Estoque.Controllers
                 }).ToList();
             var totalQuantidade = movimentacoesAnteriores.Sum(x => x.Quantidade);
             var totalValor = movimentacoesAnteriores.Sum(x => x.Valor * x.Quantidade);
-            if((int) input.Tipo == 3 || (int) input.Tipo == 4 || (int) input.Tipo == 5)
+            if ((int)input.Tipo == 3 || (int)input.Tipo == 4 || (int)input.Tipo == 5)
             {
                 totalQuantidade += input.Quantidade;
                 totalValor += input.Valor * input.Quantidade;
@@ -134,9 +135,21 @@ namespace Estoque.Controllers
 
             produtoVinculado.PrecoMedio = totalValor != 0 || totalQuantidade != 0 ? totalValor / totalQuantidade : 0;
             _context.Produtos.Update(produtoVinculado);
+            if ((int)input.Tipo >= 2)
+            {
+                var titulo = new TituloContas
+                {
+                    Data = DateTime.Now,
+                    MovimentacaoId = movimento.Id,
+                    Saldo = movimento.Valor,
+                    Situacao = Dtos.Enums.TituloContasSituacao.Aberto,
+                    ValorOriginal = movimento.Valor
+                };
+                await _context.TituloContas.AddAsync(titulo);
+            }
             await _context.Movimentacoes.AddAsync(movimento);
             await _context.SaveChangesAsync();
-            
+
             return CreatedAtAction("GetMovimento", new { id = movimento.Id }, movimento);
         }
 
