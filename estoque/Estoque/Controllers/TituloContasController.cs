@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
 using Estoque.Entidades;
 using Estoque.Dtos;
+using Estoque.Shared;
+using AutoMapper;
 
 namespace Estoque.Controllers
 {
@@ -16,10 +18,11 @@ namespace Estoque.Controllers
     public class TituloContasController : ControllerBase
     {
         private readonly EstoqueContext _context;
-
-        public TituloContasController(EstoqueContext context)
+        private readonly IMapper _mapper;
+        public TituloContasController(EstoqueContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/TituloContas
@@ -149,16 +152,22 @@ namespace Estoque.Controllers
             {
                 return BadRequest("Valor maior que o do titulo!");
             }
-            titulo.Saldo -= input.Valor;
-            titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoParcial;
-            if (titulo.Saldo == 0)
-            {
-                titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoIntegral;
-            }
-            _context.TituloContas.Update(titulo);
-            await _context.SaveChangesAsync();
-            return Ok(titulo);
 
+            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+            await movimentoProduto.LiquidacaoParcial(titulo, input.Valor);
+            return Ok(titulo);
+        }
+        public async Task<IActionResult> LiquidacaoIntegral(Guid tituloId)
+        {
+            var titulo = _context.TituloContas.Find(tituloId);
+            if (titulo == null)
+            {
+                return BadRequest("Titulo não encontrado!");
+            }
+            
+            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+            await movimentoProduto.LiquidacaoIntegral(titulo);
+            return Ok(titulo);
         }
         //2.2 Um titulo pode ser liquidado por subtituição: Por exemplo, um título é
         //aberto para a compra em questão, então o cliente decide por pagar com cartão 

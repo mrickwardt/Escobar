@@ -26,8 +26,8 @@ namespace Estoque.Entidades
         sConsumo,
         sOrdem,
         sVenda,
-        sDevolucao
-
+        sDevolucao,
+        cancelamento
     }
 
     public enum Natureza

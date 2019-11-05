@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
 using Estoque.Entidades;
+using Estoque.Shared;
 
 namespace Estoque.Controllers
 {
@@ -97,60 +98,42 @@ namespace Estoque.Controllers
                 return BadRequest("Produto vinculado não encontrado");
             }
 
-            if ((int)input.Tipo >= 2 && produtoVinculado.Quantidade < input.Quantidade)
+            if (IsTipoSaida(input) && produtoVinculado.Quantidade < input.Quantidade)
             {
                 return BadRequest(
                     "A quantidade do produto " + produtoVinculado.Nome + " é menor que a solicitada");
             }
 
-            var movimento = _mapper.Map<Movimento>(input);
-            movimento.ProdutoVinculado = produtoVinculado;
-            movimento.ProdutoId = produtoVinculado.Id;
-            if ((int)input.Tipo >= 2)
+            if (IsTipoSaida(input))
             {
-                // Saída
-                produtoVinculado.Quantidade -= input.Quantidade;
-
+                // Saida
+                MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+                await movimentoProduto.CompraProduto(produtoVinculado, input.Quantidade, input.Valor);
+                return Ok();
             }
-            else
+            else if (input.Tipo != Tipo.cancelamento)
             {
                 // Entrada
                 produtoVinculado.Quantidade += input.Quantidade;
+                _context.Produtos.Update(produtoVinculado);
+                return Ok();
             }
-
-            var movimentacoesAnteriores = _context.Movimentacoes
-                .Where(m => m.ProdutoId == input.ProdutoVinculadoId && ((int)m.Tipo == 3 || (int)m.Tipo == 4 || (int)m.Tipo == 5))
-                .Select(m => new
-                {
-                    m.Quantidade,
-                    m.Valor
-                }).ToList();
-            var totalQuantidade = movimentacoesAnteriores.Sum(x => x.Quantidade);
-            var totalValor = movimentacoesAnteriores.Sum(x => x.Valor * x.Quantidade);
-            if ((int)input.Tipo == 3 || (int)input.Tipo == 4 || (int)input.Tipo == 5)
+            else
             {
-                totalQuantidade += input.Quantidade;
-                totalValor += input.Valor * input.Quantidade;
+                // Cancelamento
+                MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+                await movimentoProduto.CancelarCompraAsync(produtoVinculado);
+                return Ok();
             }
 
-            produtoVinculado.PrecoMedio = totalValor != 0 || totalQuantidade != 0 ? totalValor / totalQuantidade : 0;
-            _context.Produtos.Update(produtoVinculado);
-            if ((int)input.Tipo >= 2)
-            {
-                var titulo = new TituloContas
-                {
-                    Data = DateTime.Now,
-                    MovimentacaoId = movimento.Id,
-                    Saldo = movimento.Valor,
-                    Situacao = Dtos.Enums.TituloContasSituacao.Aberto,
-                    ValorOriginal = movimento.Valor
-                };
-                await _context.TituloContas.AddAsync(titulo);
-            }
-            await _context.Movimentacoes.AddAsync(movimento);
-            await _context.SaveChangesAsync();
+        }
 
-            return CreatedAtAction("GetMovimento", new { id = movimento.Id }, movimento);
+        private static bool IsTipoSaida(MovimentoInput input)
+        {
+            return input.Tipo == Tipo.sConsumo ||
+                            input.Tipo == Tipo.sDevolucao ||
+                            input.Tipo == Tipo.sOrdem ||
+                            input.Tipo == Tipo.sVenda;
         }
 
         // DELETE: api/Movimentos/5
@@ -193,5 +176,7 @@ namespace Estoque.Controllers
         {
             return _context.Movimentacoes.Any(e => e.Id == id);
         }
+
+
     }
 }

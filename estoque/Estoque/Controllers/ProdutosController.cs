@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
 using Estoque.Dtos;
 using Estoque.Entidades;
+using Estoque.Shared;
 
 namespace Estoque.Controllers
 {
@@ -142,6 +143,24 @@ namespace Estoque.Controllers
         private bool ProdutoExiste(Guid id)
         {
             return _context.Produtos.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ComprarProduto(Guid produtoId, int quantidade, double valor)
+        {
+            var produto = _context.Produtos.Find(produtoId);
+            if (produto == null)
+            {
+                return BadRequest("Produto não encontrado!");
+
+            }
+            if (quantidade > produto.Quantidade)
+            {
+                return BadRequest("A quantidade comprada é maior do que a disponível!");
+            }
+            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+            await movimentoProduto.CompraProduto(produto, quantidade, valor);
+            return Ok();
         }
     }
 }
