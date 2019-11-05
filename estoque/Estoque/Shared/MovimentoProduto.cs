@@ -2,81 +2,54 @@
 using Estoque.Db;
 using Estoque.Entidades;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Estoque.Shared
 {
     public class MovimentoProduto
     {
         private readonly EstoqueContext _context;
-        private readonly IMapper _mapper;
 
-        public MovimentoProduto(EstoqueContext context, IMapper mapper)
+        public MovimentoProduto(EstoqueContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task CompraProduto(Produto produto, int quantidade, double valor)
         {
-            var movimento = new Movimento
-            {
-                ProdutoVinculado = produto,
-                ProdutoId = produto.Id,
-                Tipo = Tipo.sVenda,
-                Data = DateTime.Now,
-                Documento = new Documento
-                {
-                    Tipo = TipoDocumento.Fiscal
-                },
-                Natureza = Natureza.dev,
-                Quantidade = quantidade,
-                Valor = valor
-            };
-
+            // Cria um movimento de compra
+            var movimento = CriarMovimentoCompra(produto, quantidade, valor);
+            
+            // Realiza tratamentos no produto
             produto.Quantidade -= quantidade;
             produto.PrecoMedio = GetProdutoPrecoMedioNovo(produto, quantidade, valor);
             _context.Produtos.Update(produto);
-
+            
+            // Cria o titulo inicial
             var titulo = new TituloContas
             {
                 Data = DateTime.Now,
-                MovimentacaoId = movimento.Id,
-                Saldo = movimento.Valor,
+                ProdutoId = movimento.Id,
+                Saldo = movimento.Valor.Value,
                 Situacao = Dtos.Enums.TituloContasSituacao.Aberto,
-                ValorOriginal = movimento.Valor
+                ValorOriginal = movimento.Valor.Value
             };
             await _context.TituloContas.AddAsync(titulo);
-
+            
+            // Salva o movimento de compra
             movimento.TituloContaId = titulo.Id;
             await _context.Movimentacoes.AddAsync(movimento);
 
             await _context.SaveChangesAsync();
         }
 
-        private double GetProdutoPrecoMedioNovo(Produto produto, int quantidade, double valor)
+        public async Task LiquidacaoParcial(Produto produto, TituloContas titulo, double valor)
         {
-            var movimentacoesAnteriores = _context.Movimentacoes
-                            .Where(m => m.ProdutoId == produto.Id && IsMovimentoSaida(m))
-                            .Select(m => new { m.Quantidade, m.Valor }).ToList();
-            var totalQuantidade = movimentacoesAnteriores.Sum(x => x.Quantidade);
-            var totalValor = movimentacoesAnteriores.Sum(x => x.Valor * x.Quantidade);
-            totalQuantidade += quantidade;
-            totalValor += valor * quantidade;
-
-            return totalValor != 0 || totalQuantidade != 0 ? totalValor / totalQuantidade : 0;
-        }
-
-        private static bool IsMovimentoSaida(Movimento movimento)
-        {
-            return (int)movimento.Tipo == 3 || (int)movimento.Tipo == 4 || (int)movimento.Tipo == 5;
-        }
-
-        public async Task LiquidacaoParcial(TituloContas titulo, double valor)
-        {
-            // TODO ADD movimento
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoParcial);
+            if (!hasCreatedMovimento)
+                return;
             titulo.Saldo -= valor;
             titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoParcial;
             if (titulo.Saldo == 0)
@@ -87,40 +60,93 @@ namespace Estoque.Shared
             await _context.SaveChangesAsync();
         }
 
-        public async Task LiquidacaoIntegral(TituloContas titulo)
+        public async Task LiquidacaoIntegral(Produto produto, TituloContas titulo)
         {
-            // TODO add movimento
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoIntegral);
+            if (!hasCreatedMovimento)
+                return;
             titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoIntegral;
             _context.TituloContas.Update(titulo);
             await _context.SaveChangesAsync();
         }
 
-        internal async Task CancelarCompraAsync(Produto produtoVinculado)
+        public async Task CancelarCompra(Produto produto)
         {
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.cancelamento);
+            if (!hasCreatedMovimento)
+                return;
+            var primeiroMovimento = GetPrimeiroMovimento(produto.Id);
+            var titulo = await _context.TituloContas.FirstOrDefaultAsync(t => primeiroMovimento.ProdutoId == t.ProdutoId);
+            _context.TituloContas.Remove(titulo);
+            await _context.SaveChangesAsync();
+        }
+        
+        private double GetProdutoPrecoMedioNovo(Produto produto, int quantidade, double valor)
+        {
+            var movimentacoesAnteriores = _context.Movimentacoes
+                .Where(m => m.ProdutoId == produto.Id && IsMovimentoSaida(m))
+                .Select(m => new { m.Quantidade, m.Valor }).ToList();
+            var totalQuantidade = movimentacoesAnteriores.Sum(x => x.Quantidade);
+            var totalValor = movimentacoesAnteriores.Sum(x => x.Valor * x.Quantidade);
+            totalQuantidade += quantidade;
+            totalValor += valor * quantidade;
+
+            return (totalValor != null && totalValor.Value != 0) || totalQuantidade.Value != 0 ? totalValor.Value / totalQuantidade.Value : 0;
+        }
+        
+        private static Movimento CriarMovimentoCompra(Produto produto, int quantidade, double valor)
+        {
+            var transacaoId = Guid.NewGuid();
             var movimento = new Movimento
             {
-                ProdutoVinculado = produtoVinculado,
-                ProdutoId = produtoVinculado.Id,
-                Tipo = Tipo.cancelamento,
+                Produto = produto,
+                ProdutoId = produto.Id,
+                MovimentacaoTipo = MovimentacaoTipo.sVenda,
                 Data = DateTime.Now,
                 Documento = new Documento
                 {
                     Tipo = TipoDocumento.Fiscal
                 },
                 Natureza = Natureza.dev,
-                Quantidade = -1,
-                Valor = -1
+                Quantidade = quantidade,
+                Valor = valor,
+                CodigoTransacao = transacaoId
             };
-            var movimentacoes = _context.Movimentacoes.Select(m => new { m.Id, m.ProdutoId}).Where(m => m.ProdutoId == produtoVinculado.Id).ToList();
-            var movimentacaoIds = movimentacoes.Select(m => m.Id).ToList();
-            // TODO n titulo --> n movimentacoes = 1 compra
-            var titulos = _context.TituloContas.Where(t => movimentacaoIds.Contains(t.MovimentacaoId)).ToList();
-            foreach (var item in titulos)
+            return movimento;
+        }
+
+        public Movimento GetPrimeiroMovimento(Guid produtoId)
+        {
+            return _context.Movimentacoes
+                .Where(m => m.ProdutoId == produtoId)
+                .OrderBy(m => m.Data)
+                .FirstOrDefault();
+        }
+        
+        private async Task<bool> CreateLiquidacaoMovimento(Produto produto, MovimentacaoTipo tipoDeMovimentacaoTipo)
+        {
+            var primeiroMovimento = GetPrimeiroMovimento(produto.Id);
+            if (primeiroMovimento == null)
+                return false;
+            var movimento = new Movimento
             {
-                _context.TituloContas.Remove(item);
-            }
+                Produto = produto,
+                ProdutoId = produto.Id,
+                MovimentacaoTipo = tipoDeMovimentacaoTipo,
+                Data = DateTime.Now,
+                Documento = primeiroMovimento.Documento,
+                Natureza = primeiroMovimento.Natureza,
+                CodigoTransacao = primeiroMovimento.CodigoTransacao
+            };
             await _context.Movimentacoes.AddAsync(movimento);
-            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private static bool IsMovimentoSaida(Movimento movimento)
+        {
+            return movimento.MovimentacaoTipo == MovimentacaoTipo.sConsumo ||
+                   movimento.MovimentacaoTipo == MovimentacaoTipo.sOrdem ||
+                   movimento.MovimentacaoTipo == MovimentacaoTipo.sVenda;
         }
     }
 }

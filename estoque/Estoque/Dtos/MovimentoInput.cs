@@ -10,6 +10,6 @@ namespace Estoque.Entidades
         public DateTime Data { get; set; }
         public Natureza Natureza { get; set; }
         public Documento Documento { get; set; }
-        public Tipo Tipo { get; set; }
+        public MovimentacaoTipo MovimentacaoTipo { get; set; }
     }
 }

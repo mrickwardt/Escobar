@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Estoque.Migrations
 {
-    public partial class init : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -20,6 +20,21 @@ namespace Estoque.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Eventos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Tipo = table.Column<int>(nullable: false),
+                    Data = table.Column<DateTime>(nullable: false),
+                    CartaoDebito = table.Column<string>(nullable: true),
+                    CartaoCredito = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Eventos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Filiais",
                 columns: table => new
                 {
@@ -29,6 +44,24 @@ namespace Estoque.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Filiais", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TituloContas",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Situacao = table.Column<int>(nullable: false),
+                    Saldo = table.Column<double>(nullable: false),
+                    ValorOriginal = table.Column<double>(nullable: false),
+                    TituloSubstitutoId = table.Column<Guid>(nullable: false),
+                    TipoPagamento = table.Column<int>(nullable: false),
+                    Data = table.Column<DateTime>(nullable: false),
+                    ProdutoId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TituloContas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,12 +113,14 @@ namespace Estoque.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Data = table.Column<DateTime>(nullable: false),
-                    Quantidade = table.Column<int>(nullable: false),
-                    Valor = table.Column<double>(nullable: false),
+                    Quantidade = table.Column<int>(nullable: true),
+                    Valor = table.Column<double>(nullable: true),
                     Natureza = table.Column<int>(nullable: false),
                     DocumentoId = table.Column<Guid>(nullable: true),
-                    Tipo = table.Column<int>(nullable: false),
-                    ProdutoId = table.Column<Guid>(nullable: false)
+                    MovimentacaoTipo = table.Column<int>(nullable: false),
+                    ProdutoId = table.Column<Guid>(nullable: false),
+                    TituloContaId = table.Column<Guid>(nullable: false),
+                    CodigoTransacao = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -128,7 +163,13 @@ namespace Estoque.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Eventos");
+
+            migrationBuilder.DropTable(
                 name: "Movimentacoes");
+
+            migrationBuilder.DropTable(
+                name: "TituloContas");
 
             migrationBuilder.DropTable(
                 name: "Documento");

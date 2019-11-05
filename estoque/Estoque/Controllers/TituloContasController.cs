@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estoque.Db;
@@ -77,10 +76,7 @@ namespace Estoque.Controllers
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -96,18 +92,17 @@ namespace Estoque.Controllers
             }
 
             tituloContas.Situacao = Dtos.Enums.TituloContasSituacao.Aberto;
-            Movimento movimento = new Movimento();
-            movimento.Data = DateTime.Now;
-            movimento.Documento = new Documento();
-            movimento.Documento.Tipo = TipoDocumento.Fiscal;
-            movimento.Natureza = Natureza.dev;
-            //movimento.ProdutoId = tituloContas.
-            // movimento.Quantidade = tituloContas.q
-            movimento.Tipo = Tipo.sVenda;
-            movimento.TituloContaId = tituloContas.Id;
-            movimento.Evento = new Evento();
-
-
+            var movimento = new Movimento
+            {
+                Data = DateTime.Now,
+                Documento = new Documento {Tipo = TipoDocumento.Fiscal},
+                Natureza = Natureza.dev,
+                MovimentacaoTipo = MovimentacaoTipo.sVenda,
+                TituloContaId = tituloContas.Id
+                // movimento.ProdutoId
+                // movimento.Quantidade
+                // movimento.Evento
+            };
 
             _context.Movimentacoes.Add(movimento);
             _context.TituloContas.Add(tituloContas);
@@ -143,30 +138,29 @@ namespace Estoque.Controllers
         }
         public async Task<IActionResult> LiquidacaoParcial(TituloLiquidacaoParcialInput input)
         {
-            var titulo = _context.TituloContas.Find(input.TituloId);
+            var produto = await _context.Produtos.FindAsync(input.ProdutoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.ProdutoId == input.ProdutoId);
             if (titulo == null)
-            {
-                return BadRequest("Titulo não encontrado!");
-            }
+                return BadRequest("Título não encontrado!");
             if (titulo.Saldo < input.Valor)
-            {
                 return BadRequest("Valor maior que o do titulo!");
-            }
 
-            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
-            await movimentoProduto.LiquidacaoParcial(titulo, input.Valor);
-            return Ok(titulo);
+            var movimentoProduto = new MovimentoProduto(_context);
+            await movimentoProduto.LiquidacaoParcial(produto, titulo, input.Valor);
+            return Ok(produto);
         }
-        public async Task<IActionResult> LiquidacaoIntegral(Guid tituloId)
+        public async Task<IActionResult> LiquidacaoIntegral(Guid produtoId)
         {
-            var titulo = _context.TituloContas.Find(tituloId);
+            var produto = await _context.Produtos.FindAsync(produtoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.ProdutoId == produtoId);
             if (titulo == null)
-            {
-                return BadRequest("Titulo não encontrado!");
-            }
-            
-            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
-            await movimentoProduto.LiquidacaoIntegral(titulo);
+                return BadRequest("Título não encontrado!");
+            var movimentoProduto = new MovimentoProduto(_context);
+            await movimentoProduto.LiquidacaoIntegral(produto, titulo);
             return Ok(titulo);
         }
         //2.2 Um titulo pode ser liquidado por subtituição: Por exemplo, um título é

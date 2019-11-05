@@ -4,21 +4,22 @@ namespace Estoque.Entidades
 {
     public class Movimento
     {
-
         public Guid Id { get; set; }
         public DateTime Data { get; set; }
-        public int Quantidade { get; set; }
-        public double Valor { get; set; }
+        public int? Quantidade { get; set; }
+        public double? Valor { get; set; }
         public Natureza Natureza { get; set; }
         public Documento Documento { get; set; }
-        public Tipo Tipo { get; set; }
+        public MovimentacaoTipo MovimentacaoTipo { get; set; }
         public Guid ProdutoId { get; set; }
-        public Produto ProdutoVinculado { get; set; }
+        public Produto Produto { get; set; }
         public Guid TituloContaId { get; set; }
-        public Evento Evento { get; set; }
+        public Guid CodigoTransacao { get; set; }
+        
+        // public Evento Evento { get; set; }
     }
 
-    public enum Tipo
+    public enum MovimentacaoTipo
     {
         eDevolucao,
         eAquisicao,
@@ -27,7 +28,9 @@ namespace Estoque.Entidades
         sOrdem,
         sVenda,
         sDevolucao,
-        cancelamento
+        cancelamento,
+        liquidacaoParcial,
+        liquidacaoIntegral
     }
 
     public enum Natureza

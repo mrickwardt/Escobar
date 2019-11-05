@@ -107,11 +107,11 @@ namespace Estoque.Controllers
             if (IsTipoSaida(input))
             {
                 // Saida
-                MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+                var movimentoProduto = new MovimentoProduto(_context);
                 await movimentoProduto.CompraProduto(produtoVinculado, input.Quantidade, input.Valor);
                 return Ok();
             }
-            else if (input.Tipo != Tipo.cancelamento)
+            else if (input.MovimentacaoTipo != MovimentacaoTipo.cancelamento)
             {
                 // Entrada
                 produtoVinculado.Quantidade += input.Quantidade;
@@ -121,8 +121,8 @@ namespace Estoque.Controllers
             else
             {
                 // Cancelamento
-                MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
-                await movimentoProduto.CancelarCompraAsync(produtoVinculado);
+                var movimentoProduto = new MovimentoProduto(_context);
+                await movimentoProduto.CancelarCompra(produtoVinculado);
                 return Ok();
             }
 
@@ -130,10 +130,10 @@ namespace Estoque.Controllers
 
         private static bool IsTipoSaida(MovimentoInput input)
         {
-            return input.Tipo == Tipo.sConsumo ||
-                            input.Tipo == Tipo.sDevolucao ||
-                            input.Tipo == Tipo.sOrdem ||
-                            input.Tipo == Tipo.sVenda;
+            return input.MovimentacaoTipo == MovimentacaoTipo.sConsumo ||
+                            input.MovimentacaoTipo == MovimentacaoTipo.sDevolucao ||
+                            input.MovimentacaoTipo == MovimentacaoTipo.sOrdem ||
+                            input.MovimentacaoTipo == MovimentacaoTipo.sVenda;
         }
 
         // DELETE: api/Movimentos/5
@@ -159,7 +159,7 @@ namespace Estoque.Controllers
 
         // GET: api/Movimentos/5
         [HttpGet]
-        [Route("ProdutoVinculado/{id}")]
+        [Route("Produto/{id}")]
         public async Task<List<Movimento>> GetMovimentoPorProdutoVinculado([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)

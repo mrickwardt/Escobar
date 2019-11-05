@@ -9,10 +9,10 @@ namespace Estoque.Entidades
         public TituloContasSituacao Situacao { get; set; }
         public double Saldo { get; set; }
         public double ValorOriginal { get; set; }
-        public TituloContas Substituto { get; set; }
+        public Guid TituloSubstitutoId { get; set; }
         public TituloTipoPagamento TipoPagamento { get; set; }
         public DateTime Data { get; set; }
-        public Guid MovimentacaoId { get; set; }
+        public Guid ProdutoId { get; set; }
 
     }
 }

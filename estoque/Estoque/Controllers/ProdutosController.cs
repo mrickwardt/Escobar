@@ -158,7 +158,7 @@ namespace Estoque.Controllers
             {
                 return BadRequest("A quantidade comprada é maior do que a disponível!");
             }
-            MovimentoProduto movimentoProduto = new MovimentoProduto(_context, _mapper);
+            var movimentoProduto = new MovimentoProduto(_context);
             await movimentoProduto.CompraProduto(produto, quantidade, valor);
             return Ok();
         }

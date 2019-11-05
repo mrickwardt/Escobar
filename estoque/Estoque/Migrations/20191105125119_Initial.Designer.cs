@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191022223942_init")]
-    partial class init
+    [Migration("20191105125119_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -51,6 +51,24 @@ namespace Estoque.Migrations
                     b.ToTable("Documento");
                 });
 
+            modelBuilder.Entity("Estoque.Entidades.Evento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CartaoCredito");
+
+                    b.Property<string>("CartaoDebito");
+
+                    b.Property<DateTime>("Data");
+
+                    b.Property<int>("Tipo");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Eventos");
+                });
+
             modelBuilder.Entity("Estoque.Entidades.Filial", b =>
                 {
                     b.Property<Guid>("Id")
@@ -68,19 +86,23 @@ namespace Estoque.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<Guid>("CodigoTransacao");
+
                     b.Property<DateTime>("Data");
 
                     b.Property<Guid?>("DocumentoId");
+
+                    b.Property<int>("MovimentacaoTipo");
 
                     b.Property<int>("Natureza");
 
                     b.Property<Guid>("ProdutoId");
 
-                    b.Property<int>("Quantidade");
+                    b.Property<int?>("Quantidade");
 
-                    b.Property<int>("Tipo");
+                    b.Property<Guid>("TituloContaId");
 
-                    b.Property<double>("Valor");
+                    b.Property<double?>("Valor");
 
                     b.HasKey("Id");
 
@@ -115,6 +137,30 @@ namespace Estoque.Migrations
                     b.ToTable("Produtos");
                 });
 
+            modelBuilder.Entity("Estoque.Entidades.TituloContas", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("Data");
+
+                    b.Property<Guid>("ProdutoId");
+
+                    b.Property<double>("Saldo");
+
+                    b.Property<int>("Situacao");
+
+                    b.Property<int>("TipoPagamento");
+
+                    b.Property<Guid>("TituloSubstitutoId");
+
+                    b.Property<double>("ValorOriginal");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TituloContas");
+                });
+
             modelBuilder.Entity("Estoque.Entidades.Deposito", b =>
                 {
                     b.HasOne("Estoque.Entidades.Filial", "FilialVinculada")
@@ -129,7 +175,7 @@ namespace Estoque.Migrations
                         .WithMany()
                         .HasForeignKey("DocumentoId");
 
-                    b.HasOne("Estoque.Entidades.Produto", "ProdutoVinculado")
+                    b.HasOne("Estoque.Entidades.Produto", "Produto")
                         .WithMany()
                         .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade);
