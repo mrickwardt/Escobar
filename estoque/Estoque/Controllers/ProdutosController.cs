@@ -146,6 +146,7 @@ namespace Estoque.Controllers
         }
 
         [HttpPost]
+        [Route("/Comprar")]
         public async Task<IActionResult> ComprarProduto(Guid produtoId, int quantidade, double valor)
         {
             var produto = _context.Produtos.Find(produtoId);

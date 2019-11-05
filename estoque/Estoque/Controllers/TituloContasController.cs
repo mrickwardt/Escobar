@@ -136,6 +136,8 @@ namespace Estoque.Controllers
         {
             return _context.TituloContas.Any(e => e.Id == id);
         }
+        [HttpPost]
+        [Route("/Liquidacao/Parcial")]
         public async Task<IActionResult> LiquidacaoParcial(TituloLiquidacaoParcialInput input)
         {
             var produto = await _context.Produtos.FindAsync(input.ProdutoId);
@@ -151,6 +153,9 @@ namespace Estoque.Controllers
             await movimentoProduto.LiquidacaoParcial(produto, titulo, input.Valor);
             return Ok(produto);
         }
+        
+        [HttpPost]
+        [Route("/Liquidacao/Integral")]
         public async Task<IActionResult> LiquidacaoIntegral(Guid produtoId)
         {
             var produto = await _context.Produtos.FindAsync(produtoId);
@@ -163,11 +168,14 @@ namespace Estoque.Controllers
             await movimentoProduto.LiquidacaoIntegral(produto, titulo);
             return Ok(titulo);
         }
+        
         //2.2 Um titulo pode ser liquidado por subtituição: Por exemplo, um título é
         //aberto para a compra em questão, então o cliente decide por pagar com cartão 
         //de crédito.Neste momento o títulos é substituido por outro título, cujo sacado 
         //passa a ser a operadora de cartão de crédito.Essa movimentação também precisa ser 
         //mapeada de forma a integrar os valor contabilmente
+        [HttpPost]
+        [Route("/Liquidacao/Substituicao")]
         public async Task<IActionResult> LiquidacaoPorSubstituicao(TituloLiquidacaoSubstituicaoInput input)
         {
             var titulo = _context.TituloContas.Find(input.TituloId);
