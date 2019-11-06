@@ -13,6 +13,6 @@ namespace Estoque.Entidades
         public TituloTipoPagamento TipoPagamento { get; set; }
         public DateTime Data { get; set; }
         public Guid ProdutoId { get; set; }
-
+        public Guid CodigoTransacao { get; set; }
     }
 }

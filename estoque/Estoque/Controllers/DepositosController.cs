@@ -91,11 +91,14 @@ namespace Estoque.Controllers
                 return BadRequest(ModelState);
             }
 
+            var existeDepositoComNome = _context.Depositos.Any(d => d.Nome == depositoInput.Nome);
+            if (existeDepositoComNome)
+                return BadRequest("Já existe um depósito com este nome");
+
             var filialVinculada = _context.Filiais.Find(depositoInput.FilialVinculadaId);
 
-            if (filialVinculada == null){
+            if (filialVinculada == null)
                 return BadRequest("Filial não existe");
-            }
 
             var deposito = _mapper.Map<Deposito>(depositoInput);
             deposito.FilialId = depositoInput.FilialVinculadaId;
@@ -121,15 +124,11 @@ namespace Estoque.Controllers
         public async Task<IActionResult> DeleteDeposito([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var deposito = await _context.Depositos.FindAsync(id);
             if (deposito == null)
-            {
                 return NotFound();
-            }
 
             _context.Depositos.Remove(deposito);
             await _context.SaveChangesAsync();
@@ -148,9 +147,7 @@ namespace Estoque.Controllers
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (deposito == null)
-            {
                 return null;
-            }
 
             return deposito.Produtos;
         }

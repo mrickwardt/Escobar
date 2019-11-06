@@ -57,7 +57,8 @@ namespace Estoque.Migrations
                     TituloSubstitutoId = table.Column<Guid>(nullable: false),
                     TipoPagamento = table.Column<int>(nullable: false),
                     Data = table.Column<DateTime>(nullable: false),
-                    ProdutoId = table.Column<Guid>(nullable: false)
+                    ProdutoId = table.Column<Guid>(nullable: false),
+                    CodigoTransacao = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {

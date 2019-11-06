@@ -107,8 +107,8 @@ namespace Estoque.Controllers
             if (IsTipoSaida(input))
             {
                 // Saida
-                var movimentoProduto = new MovimentoProduto(_context);
-                await movimentoProduto.CompraProduto(produtoVinculado, input.Quantidade, input.Valor);
+                var movimentoVenda = new MovimentoVenda(_context);
+                await movimentoVenda.VendaProduto(produtoVinculado, input.Quantidade, input.Valor);
                 return Ok();
             }
             else if (input.MovimentacaoTipo != MovimentacaoTipo.cancelamento)
@@ -118,14 +118,8 @@ namespace Estoque.Controllers
                 _context.Produtos.Update(produtoVinculado);
                 return Ok();
             }
-            else
-            {
-                // Cancelamento
-                var movimentoProduto = new MovimentoProduto(_context);
-                await movimentoProduto.CancelarCompra(produtoVinculado);
-                return Ok();
-            }
-
+            // Cancelamento
+            return BadRequest("Acesse o método de TituloContas/CancelarPedido");
         }
 
         private static bool IsTipoSaida(MovimentoInput input)

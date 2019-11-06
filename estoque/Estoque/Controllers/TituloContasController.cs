@@ -136,36 +136,47 @@ namespace Estoque.Controllers
         {
             return _context.TituloContas.Any(e => e.Id == id);
         }
+
         [HttpPost]
         [Route("/Liquidacao/Parcial")]
         public async Task<IActionResult> LiquidacaoParcial(TituloLiquidacaoParcialInput input)
         {
-            var produto = await _context.Produtos.FindAsync(input.ProdutoId);
-            if (produto == null)
-                return BadRequest("Produto não encontrado!");
-            var titulo = _context.TituloContas.FirstOrDefault(t => t.ProdutoId == input.ProdutoId);
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.CodigoTransacao == input.CodigoTransacao);
             if (titulo == null)
                 return BadRequest("Título não encontrado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.LiquidadoIntegral)
+                return BadRequest("Título já liquidado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.Cancelado)
+                return BadRequest("Título cancelado!");
+            var produto = await _context.Produtos.FindAsync(titulo.ProdutoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+
             if (titulo.Saldo < input.Valor)
                 return BadRequest("Valor maior que o do titulo!");
 
-            var movimentoProduto = new MovimentoProduto(_context);
-            await movimentoProduto.LiquidacaoParcial(produto, titulo, input.Valor);
+            var movimentoVenda = new MovimentoVenda(_context);
+            await movimentoVenda.LiquidacaoParcial(produto, titulo, input.Valor);
             return Ok(produto);
         }
         
         [HttpPost]
         [Route("/Liquidacao/Integral")]
-        public async Task<IActionResult> LiquidacaoIntegral(Guid produtoId)
+        public async Task<IActionResult> LiquidacaoIntegral(Guid codigoTransacao)
         {
-            var produto = await _context.Produtos.FindAsync(produtoId);
-            if (produto == null)
-                return BadRequest("Produto não encontrado!");
-            var titulo = _context.TituloContas.FirstOrDefault(t => t.ProdutoId == produtoId);
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.CodigoTransacao == codigoTransacao);
             if (titulo == null)
                 return BadRequest("Título não encontrado!");
-            var movimentoProduto = new MovimentoProduto(_context);
-            await movimentoProduto.LiquidacaoIntegral(produto, titulo);
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.LiquidadoIntegral)
+                return BadRequest("Título já liquidado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.Cancelado)
+                return BadRequest("Título cancelado!");
+            var produto = await _context.Produtos.FindAsync(titulo.ProdutoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+            
+            var movimentoVenda = new MovimentoVenda(_context);
+            await movimentoVenda.LiquidacaoIntegral(produto, titulo);
             return Ok(titulo);
         }
         
@@ -176,22 +187,43 @@ namespace Estoque.Controllers
         //mapeada de forma a integrar os valor contabilmente
         [HttpPost]
         [Route("/Liquidacao/Substituicao")]
-        public async Task<IActionResult> LiquidacaoPorSubstituicao(TituloLiquidacaoSubstituicaoInput input)
+        public async Task<IActionResult> LiquidacaoPorSubstituicao(Guid codigoTransacao)
         {
-            var titulo = _context.TituloContas.Find(input.TituloId);
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.CodigoTransacao == codigoTransacao);
             if (titulo == null)
-            {
-                return BadRequest("Titulo não encontrado!");
-            }
-            if (titulo.Saldo < input.Valor)
-            {
-                return BadRequest("Valor maior que o do titulo!");
-            }
-            titulo.Saldo -= input.Valor;
-            _context.TituloContas.Update(titulo);
-            await _context.SaveChangesAsync();
+                return BadRequest("Título não encontrado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.LiquidadoIntegral)
+                return BadRequest("Título já liquidado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.Cancelado)
+                return BadRequest("Título cancelado!");
+            var produto = await _context.Produtos.FindAsync(titulo.ProdutoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+
+            var movimentoVenda = new MovimentoVenda(_context);
+            await movimentoVenda.SubstituirTitulo(produto, titulo);
             return Ok(titulo);
 
+        }
+
+        [HttpPost]
+        [Route("/CancelarPedido")]
+        public async Task<IActionResult> CancelarPedido(Guid codigoTransacao)
+        {
+            var titulo = _context.TituloContas.FirstOrDefault(t => t.CodigoTransacao == codigoTransacao);
+            if (titulo == null)
+                return BadRequest("Título não encontrado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.LiquidadoIntegral)
+                return BadRequest("Título já liquidado!");
+            if (titulo.Situacao == Dtos.Enums.TituloContasSituacao.Cancelado)
+                return BadRequest("Título cancelado!");
+            var produto = await _context.Produtos.FindAsync(titulo.ProdutoId);
+            if (produto == null)
+                return BadRequest("Produto não encontrado!");
+
+            var movimentoVenda = new MovimentoVenda(_context);
+            await movimentoVenda.CancelarCompra(produto, titulo);
+            return Ok();
         }
     }
 }

@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Estoque.Shared
 {
-    public class MovimentoProduto
+    public class MovimentoVenda
     {
         private readonly EstoqueContext _context;
 
-        public MovimentoProduto(EstoqueContext context)
+        public MovimentoVenda(EstoqueContext context)
         {
             _context = context;
         }
 
-        public async Task CompraProduto(Produto produto, int quantidade, double valor)
+        public async Task VendaProduto(Produto produto, int quantidade, double valor)
         {
             // Cria um movimento de compra
             var movimento = CriarMovimentoCompra(produto, quantidade, valor);
@@ -31,10 +31,11 @@ namespace Estoque.Shared
             var titulo = new TituloContas
             {
                 Data = DateTime.Now,
-                ProdutoId = movimento.Id,
+                ProdutoId = movimento.ProdutoId,
                 Saldo = movimento.Valor.Value,
                 Situacao = Dtos.Enums.TituloContasSituacao.Aberto,
-                ValorOriginal = movimento.Valor.Value
+                ValorOriginal = movimento.Valor.Value,
+                CodigoTransacao = movimento.CodigoTransacao
             };
             await _context.TituloContas.AddAsync(titulo);
             
@@ -47,7 +48,7 @@ namespace Estoque.Shared
 
         public async Task LiquidacaoParcial(Produto produto, TituloContas titulo, double valor)
         {
-            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoParcial);
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoParcial, titulo.Id);
             if (!hasCreatedMovimento)
                 return;
             titulo.Saldo -= valor;
@@ -62,22 +63,30 @@ namespace Estoque.Shared
 
         public async Task LiquidacaoIntegral(Produto produto, TituloContas titulo)
         {
-            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoIntegral);
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoIntegral, titulo.Id);
             if (!hasCreatedMovimento)
                 return;
             titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoIntegral;
+            titulo.Saldo = 0;
             _context.TituloContas.Update(titulo);
             await _context.SaveChangesAsync();
         }
 
-        public async Task CancelarCompra(Produto produto)
+        public async Task CancelarCompra(Produto produto, TituloContas titulo)
         {
-            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.cancelamento);
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.cancelamento, titulo.Id);
             if (!hasCreatedMovimento)
                 return;
-            var primeiroMovimento = GetPrimeiroMovimento(produto.Id);
-            var titulo = await _context.TituloContas.FirstOrDefaultAsync(t => primeiroMovimento.ProdutoId == t.ProdutoId);
-            _context.TituloContas.Remove(titulo);
+            var movimentoDeAbertura = await _context.Movimentacoes.FirstOrDefaultAsync(m => m.CodigoTransacao == titulo.CodigoTransacao);
+            if (movimentoDeAbertura == null)
+            {
+                return;
+            }
+            produto.Quantidade += movimentoDeAbertura.Quantidade ?? 0;
+
+            titulo.Situacao = Dtos.Enums.TituloContasSituacao.Cancelado;
+            _context.Produtos.Update(produto);
+            _context.TituloContas.Update(titulo);
             await _context.SaveChangesAsync();
         }
         
@@ -123,7 +132,7 @@ namespace Estoque.Shared
                 .FirstOrDefault();
         }
         
-        private async Task<bool> CreateLiquidacaoMovimento(Produto produto, MovimentacaoTipo tipoDeMovimentacaoTipo)
+        private async Task<bool> CreateLiquidacaoMovimento(Produto produto, MovimentacaoTipo tipoDeMovimentacaoTipo, Guid? tituloId)
         {
             var primeiroMovimento = GetPrimeiroMovimento(produto.Id);
             if (primeiroMovimento == null)
@@ -135,6 +144,7 @@ namespace Estoque.Shared
                 MovimentacaoTipo = tipoDeMovimentacaoTipo,
                 Data = DateTime.Now,
                 Documento = primeiroMovimento.Documento,
+                TituloContaId = tituloId.Value,
                 Natureza = primeiroMovimento.Natureza,
                 CodigoTransacao = primeiroMovimento.CodigoTransacao
             };
@@ -147,6 +157,31 @@ namespace Estoque.Shared
             return movimento.MovimentacaoTipo == MovimentacaoTipo.sConsumo ||
                    movimento.MovimentacaoTipo == MovimentacaoTipo.sOrdem ||
                    movimento.MovimentacaoTipo == MovimentacaoTipo.sVenda;
+        }
+
+        public async Task SubstituirTitulo(Produto produto, TituloContas titulo)
+        {
+            var hasCreatedMovimento = await CreateLiquidacaoMovimento(produto, MovimentacaoTipo.liquidacaoIntegral, titulo.Id);
+            if (!hasCreatedMovimento)
+                return;
+
+            var tituloSubstituto = new TituloContas
+            {
+                CodigoTransacao = titulo.CodigoTransacao,
+                Data = DateTime.Now,
+                Situacao = Dtos.Enums.TituloContasSituacao.Aberto,
+                ProdutoId = produto.Id,
+                Saldo = titulo.Saldo,
+                TipoPagamento = Dtos.Enums.TituloTipoPagamento.Integral,
+                ValorOriginal = titulo.Saldo
+            };
+            await _context.TituloContas.AddAsync(tituloSubstituto);
+            
+            titulo.Situacao = Dtos.Enums.TituloContasSituacao.LiquidadoPorSubstituicao;
+            titulo.Saldo = 0;
+            titulo.TituloSubstitutoId = tituloSubstituto.Id;
+            _context.TituloContas.Update(titulo);
+            await _context.SaveChangesAsync();
         }
     }
 }
