@@ -15,22 +15,6 @@ namespace Estoque.Entidades
         public Produto Produto { get; set; }
         public Guid TituloContaId { get; set; }
         public Guid CodigoTransacao { get; set; }
-        
-        // public Evento Evento { get; set; }
-    }
-
-    public enum MovimentacaoTipo
-    {
-        eDevolucao,
-        eAquisicao,
-        eFabricação,
-        sConsumo,
-        sOrdem,
-        sVenda,
-        sDevolucao,
-        cancelamento,
-        liquidacaoParcial,
-        liquidacaoIntegral
     }
 
     public enum Natureza

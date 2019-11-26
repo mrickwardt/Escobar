@@ -116,7 +116,7 @@ namespace Estoque.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDeposito", new { id = deposito.Id }, deposito);
+            return Ok(deposito.Id.ToString());
         }
 
         // DELETE: api/Depositos/5

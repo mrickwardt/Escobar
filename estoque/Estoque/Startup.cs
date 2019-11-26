@@ -26,12 +26,9 @@ namespace Estoque
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
             services.AddDbContext<EstoqueContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services
-                .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Estoque", Version = "v1" }));
+            services .AddSwaggerGen(c => c.SwaggerDoc("v1", new Info { Title = "Estoque", Version = "v1" }));
             
             // AutoMapper
             var mappingConfig = new MapperConfiguration(mc =>
@@ -46,13 +43,10 @@ namespace Estoque
             services.AddSingleton(mapper);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
             app.UseSwagger()
                 .UseSwaggerUI(c =>
