@@ -15,6 +15,7 @@ namespace Estoque.Entidades
         public Produto Produto { get; set; }
         public Guid TituloContaId { get; set; }
         public Guid CodigoTransacao { get; set; }
+        public bool IsCongelado { get; set; }
     }
 
     public enum Natureza

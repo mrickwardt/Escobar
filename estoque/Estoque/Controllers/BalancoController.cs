@@ -47,11 +47,12 @@ namespace Estoque.Controllers
             var lastDayOfLastMonth = startOfTthisMonth.AddTicks(-1);
             var movimentacoesPorTipoNoUltimoMes = _context.Movimentacoes
                 .Where(m => m.Data >= firstDayOfLastMonth && m.Data <= lastDayOfLastMonth)
+                .Where(m => !m.IsCongelado)
                 .GroupBy(m => m.MovimentacaoTipo)
                 .ToList();
             var movSumarizado = (
                 from movimentacaoPorTipo in movimentacoesPorTipoNoUltimoMes
-                let somaTotalPorTipo = movimentacaoPorTipo.Sum(m => m.Valor)
+                let somaTotalPorTipo = movimentacaoPorTipo.Sum(m => m.Valor * m.Quantidade)
                 select new MovimentoSumarizado { Data = lastDayOfLastMonth, Valor = somaTotalPorTipo, MovimentacaoTipo = movimentacaoPorTipo.First().MovimentacaoTipo }
             ).ToList();
             
@@ -74,9 +75,9 @@ namespace Estoque.Controllers
             foreach (var movimentoSumarizado in movimentosSumarizado)
             {
                 var controleAtual = controles.FirstOrDefault(c => c.MovimentacaoTipo == movimentoSumarizado.MovimentacaoTipo);
-                if (string.IsNullOrEmpty(controleAtual.ContaDebitar))
+                if (!string.IsNullOrEmpty(controleAtual.ContaDebitar))
                     DebitarPorControle(controleAtual, movimentoSumarizado);
-                if (string.IsNullOrEmpty(controleAtual.ContaSacar))
+                if (!string.IsNullOrEmpty(controleAtual.ContaSacar))
                     SacarPorControle(controleAtual, movimentoSumarizado);
                 tiposJaSumarizados.Add(controleAtual.MovimentacaoTipo);
             }
@@ -85,7 +86,11 @@ namespace Estoque.Controllers
                 .Where(m => m.Data >= firstDayOfLastMonth && m.Data <= lastDayOfLastMonth)
                 .Where(m => tiposJaSumarizados.Contains(m.MovimentacaoTipo))
                 .ToList();
-            _context.Movimentacoes.RemoveRange(movimentosParaApagar);
+            foreach (var item in movimentosParaApagar)
+            {
+                item.IsCongelado = true;
+            }
+            _context.Movimentacoes.UpdateRange(movimentosParaApagar);
             await _context.SaveChangesAsync();
         }
 

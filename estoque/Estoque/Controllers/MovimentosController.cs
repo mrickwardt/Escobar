@@ -28,7 +28,13 @@ namespace Estoque.Controllers
         [HttpGet]
         public IEnumerable<Movimento> GetMovimento()
         {
-            return _context.Movimentacoes;
+            return _context.Movimentacoes.Where(m => !m.IsCongelado);
+        }
+
+        [HttpGet("MovimentosCongelados")]
+        public IEnumerable<Movimento> GetMovimentoCongelado()
+        {
+            return _context.Movimentacoes.Where(m => m.IsCongelado);
         }
 
         // GET: api/Movimentos/5
