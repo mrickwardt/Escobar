@@ -61,11 +61,12 @@ namespace Estoque.Controllers
         }
         
         [HttpPost("MapearMovimentos")]
-        public async Task MapearMovimentosSumarizadosDoUltimoMes()
+        public async Task<Dictionary<string, double>> MapearMovimentosSumarizadosDoUltimoMes()
         {
             var startOfTthisMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             var firstDayOfLastMonth = startOfTthisMonth.AddMonths(-1);
             var lastDayOfLastMonth = startOfTthisMonth.AddTicks(-1);
+            var relatorio = new Dictionary<string, double>();
             
             var movimentosSumarizado = _context.MovimencoesSumarizadas
                 .Where(m => m.Data >= firstDayOfLastMonth && m.Data <= lastDayOfLastMonth).ToList();
@@ -75,9 +76,30 @@ namespace Estoque.Controllers
             foreach (var movimentoSumarizado in movimentosSumarizado)
             {
                 var controleAtual = controles.FirstOrDefault(c => c.MovimentacaoTipo == movimentoSumarizado.MovimentacaoTipo);
-                if (!string.IsNullOrEmpty(controleAtual.ContaDebitar))
+                if(controleAtual == null)
+                    continue;
+                foreach (var conta in controleAtual.ContaDebitar)
+                {
+                    if (movimentoSumarizado.Valor == null) continue;
+                    if (relatorio.ContainsKey(conta.Conta))
+                        relatorio[conta.Conta] += movimentoSumarizado.Valor.Value;
+                    else
+                        relatorio.Add(conta.Conta, movimentoSumarizado.Valor.Value);
+                }
+                foreach (var conta in controleAtual.ContaCreditar)
+                {
+                    if (movimentoSumarizado.Valor == null) continue;
+                    if (relatorio.ContainsKey(conta.Conta))
+                        relatorio[conta.Conta] -= movimentoSumarizado.Valor.Value;
+                    else
+                        relatorio.Add(conta.Conta, - movimentoSumarizado.Valor.Value);
+                }
+                
+                
+                if (controleAtual.ContaDebitar != null && controleAtual.ContaDebitar.Any())
                     DebitarPorControle(controleAtual, movimentoSumarizado);
-                if (!string.IsNullOrEmpty(controleAtual.ContaSacar))
+
+                if (controleAtual.ContaCreditar != null && controleAtual.ContaCreditar.Any())
                     SacarPorControle(controleAtual, movimentoSumarizado);
                 tiposJaSumarizados.Add(controleAtual.MovimentacaoTipo);
             }
@@ -92,17 +114,21 @@ namespace Estoque.Controllers
             }
             _context.Movimentacoes.UpdateRange(movimentosParaApagar);
             await _context.SaveChangesAsync();
+            return relatorio;
         }
 
         private void SacarPorControle(Controle controleAtual, MovimentoSumarizado movimentoSumarizado)
         {
             var valor = movimentoSumarizado.Valor;
-            var contaParaSacar = controleAtual.ContaSacar;
+            var contaParaSacar = controleAtual.ContaCreditar;
             var data = DateTime.Now;
             var movimentoTipo = controleAtual.MovimentacaoTipo.ToString();
-            Console.WriteLine("---------------|| SACAR POR CONTROLE ||---------------");
-            Console.WriteLine("Será sacado {0} da conta {1} na data de {2} para as contas de {3}", valor, contaParaSacar, data, movimentoTipo);
-            Console.WriteLine("---------------|| SACAR POR CONTROLE - FIM ||---------------");
+            foreach (var conta in contaParaSacar)
+            {
+                Console.WriteLine("---------------|| SACAR POR CONTROLE ||---------------");
+                Console.WriteLine("Será sacado {0} da conta {1} na data de {2} para as contas de {3}", valor, conta.Conta, data, movimentoTipo);
+                Console.WriteLine("---------------|| SACAR POR CONTROLE - FIM ||---------------");
+            }
         }
 
         private void DebitarPorControle(Controle controleAtual, MovimentoSumarizado movimentoSumarizado)
@@ -111,9 +137,12 @@ namespace Estoque.Controllers
             var contaParaDebitar = controleAtual.ContaDebitar;
             var data = DateTime.Now;
             var movimentoTipo = controleAtual.MovimentacaoTipo.ToString();
-            Console.WriteLine("---------------|| DEBITO POR CONTROLE ||---------------");
-            Console.WriteLine("Será debitado {0} da conta {1} na data de {2} para as contas de {3}", valor, contaParaDebitar, data, movimentoTipo);
-            Console.WriteLine("---------------|| DEBITO POR CONTROLE - FIM ||---------------");
+            foreach (var conta in contaParaDebitar)
+            {
+                Console.WriteLine("---------------|| DEBITO POR CONTROLE ||---------------");
+                Console.WriteLine("Será debitado {0} da conta {1} na data de {2} para as contas de {3}", valor, conta.Conta, data, movimentoTipo);
+                Console.WriteLine("---------------|| DEBITO POR CONTROLE - FIM ||---------------");
+            }
         }
     }
 }

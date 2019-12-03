@@ -7,9 +7,6 @@ namespace Estoque.Entidades
         public Guid ProdutoVinculadoId { get; set; }
         public int Quantidade { get; set; }
         public double Valor{ get; set; }
-        public DateTime Data { get; set; }
-        public Natureza Natureza { get; set; }
-        public Documento Documento { get; set; }
         public MovimentacaoTipo MovimentacaoTipo { get; set; }
     }
 }

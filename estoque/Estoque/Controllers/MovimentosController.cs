@@ -93,23 +93,16 @@ namespace Estoque.Controllers
         public async Task<IActionResult> PostMovimento([FromBody] MovimentoInput input)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var produtoVinculado = _context.Produtos.Find(input.ProdutoVinculadoId);
 
             if (produtoVinculado == null)
-            {
                 return BadRequest("Produto vinculado não encontrado");
-            }
 
             if (IsTipoSaida(input) && produtoVinculado.Quantidade < input.Quantidade)
-            {
-                return BadRequest(
-                    "A quantidade do produto " + produtoVinculado.Nome + " é menor que a solicitada");
-            }
-
+                return BadRequest("A quantidade do produto " + produtoVinculado.Nome + " é menor que a solicitada");
+            
             if (IsTipoSaida(input))
             {
                 // Saida
@@ -117,15 +110,30 @@ namespace Estoque.Controllers
                 await movimentoVenda.VendaProduto(produtoVinculado, input.Quantidade, input.Valor);
                 return Ok();
             }
-            else if (input.MovimentacaoTipo != MovimentacaoTipo.cancelamento)
-            {
-                // Entrada
-                produtoVinculado.Quantidade += input.Quantidade;
-                _context.Produtos.Update(produtoVinculado);
-                return Ok();
-            }
+
             // Cancelamento
-            return BadRequest("Acesse o método de TituloContas/CancelarPedido");
+            if (input.MovimentacaoTipo == MovimentacaoTipo.cancelamento)
+                return BadRequest("Acesse o método de TituloContas/CancelarPedido");
+            
+            // Entrada
+            produtoVinculado.Quantidade += input.Quantidade;
+            await _context.Movimentacoes.AddAsync(
+                new Movimento
+                {
+                    Data = DateTime.Now,
+                    Documento = new Documento(),
+                    Natureza = Natureza.dev,
+                    ProdutoId = produtoVinculado.Id,
+                    Quantidade = input.Quantidade,
+                    Valor = input.Valor,
+                    IsCongelado = false,
+                    CodigoTransacao = Guid.NewGuid(),
+                    MovimentacaoTipo = input.MovimentacaoTipo,
+                }
+            );
+            _context.Produtos.Update(produtoVinculado);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         private static bool IsTipoSaida(MovimentoInput input)

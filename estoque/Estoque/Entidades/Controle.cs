@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Estoque.Entidades
 {
@@ -6,7 +7,16 @@ namespace Estoque.Entidades
     {
         public Guid Id { get; set; }
         public MovimentacaoTipo MovimentacaoTipo { get; set; }
-        public string ContaDebitar { get; set; }
-        public string ContaSacar { get; set; }
+        public List<ControleConta> ContaDebitar { get; set; }
+        public List<ControleConta> ContaCreditar { get; set; }
+    }
+
+    public class ControleConta
+    {
+        public ControleConta(string conta)
+        {
+            Conta = conta;
+        }
+        public string Conta { get; set; }
     }
 }
