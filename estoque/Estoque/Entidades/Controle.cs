@@ -15,8 +15,11 @@ namespace Estoque.Entidades
     {
         public ControleConta(string conta)
         {
+            Id = Guid.NewGuid();
             Conta = conta;
         }
+
+        public Guid Id { get; set; }
         public string Conta { get; set; }
     }
 }

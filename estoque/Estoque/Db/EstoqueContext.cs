@@ -18,8 +18,8 @@ namespace Estoque.Db
             SeedFiliais(modelBuilder, filialId);
             SeedDepositos(modelBuilder, filialId, depositoId);
             SeedProdutos(modelBuilder, produtoId);
-            SeedEntradaProdutoControle(modelBuilder);
-            SeedSaidaProdutoControle(modelBuilder);
+            //SeedEntradaProdutoControle(modelBuilder);
+            //SeedSaidaProdutoControle(modelBuilder);
         }
 
         private static void SeedFiliais(ModelBuilder modelBuilder, Guid filialId)

@@ -8,6 +8,18 @@ namespace Estoque.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Controles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    MovimentacaoTipo = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Controles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Documento",
                 columns: table => new
                 {
@@ -20,21 +32,6 @@ namespace Estoque.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Eventos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(nullable: false),
-                    Tipo = table.Column<int>(nullable: false),
-                    Data = table.Column<DateTime>(nullable: false),
-                    CartaoDebito = table.Column<string>(nullable: true),
-                    CartaoCredito = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Eventos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Filiais",
                 columns: table => new
                 {
@@ -44,6 +41,21 @@ namespace Estoque.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Filiais", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MovimencoesSumarizadas",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Valor = table.Column<double>(nullable: true),
+                    MovimentacaoTipo = table.Column<int>(nullable: false),
+                    Data = table.Column<DateTime>(nullable: false),
+                    Observacao = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MovimencoesSumarizadas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,6 +75,32 @@ namespace Estoque.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TituloContas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ControleConta",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Conta = table.Column<string>(nullable: true),
+                    ControleId = table.Column<Guid>(nullable: true),
+                    ControleId1 = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ControleConta", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ControleConta_Controles_ControleId",
+                        column: x => x.ControleId,
+                        principalTable: "Controles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ControleConta_Controles_ControleId1",
+                        column: x => x.ControleId1,
+                        principalTable: "Controles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,7 +159,8 @@ namespace Estoque.Migrations
                     MovimentacaoTipo = table.Column<int>(nullable: false),
                     ProdutoId = table.Column<Guid>(nullable: false),
                     TituloContaId = table.Column<Guid>(nullable: false),
-                    CodigoTransacao = table.Column<Guid>(nullable: false)
+                    CodigoTransacao = table.Column<Guid>(nullable: false),
+                    IsCongelado = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,6 +178,31 @@ namespace Estoque.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Filiais",
+                columns: new[] { "Id", "Nome" },
+                values: new object[] { new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fa"), "f1" });
+
+            migrationBuilder.InsertData(
+                table: "Produtos",
+                columns: new[] { "Id", "DepositoId", "Nome", "PrecoMedio", "Quantidade", "Tipo", "ValorBase" },
+                values: new object[] { new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fc"), null, "p1", 0.0, 50, 2, 10.0 });
+
+            migrationBuilder.InsertData(
+                table: "Depositos",
+                columns: new[] { "Id", "DataHora", "FilialId", "Nome" },
+                values: new object[] { new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fb"), new DateTime(2019, 12, 3, 1, 12, 56, 842, DateTimeKind.Local), new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fa"), "d1" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ControleConta_ControleId",
+                table: "ControleConta",
+                column: "ControleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ControleConta_ControleId1",
+                table: "ControleConta",
+                column: "ControleId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Depositos_FilialId",
@@ -164,13 +228,19 @@ namespace Estoque.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Eventos");
+                name: "ControleConta");
+
+            migrationBuilder.DropTable(
+                name: "MovimencoesSumarizadas");
 
             migrationBuilder.DropTable(
                 name: "Movimentacoes");
 
             migrationBuilder.DropTable(
                 name: "TituloContas");
+
+            migrationBuilder.DropTable(
+                name: "Controles");
 
             migrationBuilder.DropTable(
                 name: "Documento");

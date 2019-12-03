@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Estoque.Migrations
 {
     [DbContext(typeof(EstoqueContext))]
-    [Migration("20191127001711_add_IsCongelado_Movimentacao")]
-    partial class add_IsCongelado_Movimentacao
+    [Migration("20191203041257_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.8-servicing-32085")
+                .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -26,15 +26,31 @@ namespace Estoque.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ContaDebitar");
-
-                    b.Property<string>("ContaSacar");
-
                     b.Property<int>("MovimentacaoTipo");
 
                     b.HasKey("Id");
 
                     b.ToTable("Controles");
+                });
+
+            modelBuilder.Entity("Estoque.Entidades.ControleConta", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Conta");
+
+                    b.Property<Guid?>("ControleId");
+
+                    b.Property<Guid?>("ControleId1");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ControleId");
+
+                    b.HasIndex("ControleId1");
+
+                    b.ToTable("ControleConta");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Deposito", b =>
@@ -55,7 +71,7 @@ namespace Estoque.Migrations
                     b.ToTable("Depositos");
 
                     b.HasData(
-                        new { Id = new Guid("89a8c2cc-8a11-4499-b73a-e33259073a5c"), DataHora = new DateTime(2019, 11, 26, 21, 17, 10, 940, DateTimeKind.Local), FilialId = new Guid("686f7191-d1c0-43d5-9237-d894f0ec3ee8"), Nome = "d1" }
+                        new { Id = new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fb"), DataHora = new DateTime(2019, 12, 3, 1, 12, 56, 842, DateTimeKind.Local), FilialId = new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fa"), Nome = "d1" }
                     );
                 });
 
@@ -83,7 +99,7 @@ namespace Estoque.Migrations
                     b.ToTable("Filiais");
 
                     b.HasData(
-                        new { Id = new Guid("686f7191-d1c0-43d5-9237-d894f0ec3ee8"), Nome = "f1" }
+                        new { Id = new Guid("793c3eb7-9a98-4097-9870-0e4e9777d4fa"), Nome = "f1" }
                     );
                 });
 
@@ -191,6 +207,17 @@ namespace Estoque.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TituloContas");
+                });
+
+            modelBuilder.Entity("Estoque.Entidades.ControleConta", b =>
+                {
+                    b.HasOne("Estoque.Entidades.Controle")
+                        .WithMany("ContaCreditar")
+                        .HasForeignKey("ControleId");
+
+                    b.HasOne("Estoque.Entidades.Controle")
+                        .WithMany("ContaDebitar")
+                        .HasForeignKey("ControleId1");
                 });
 
             modelBuilder.Entity("Estoque.Entidades.Deposito", b =>
