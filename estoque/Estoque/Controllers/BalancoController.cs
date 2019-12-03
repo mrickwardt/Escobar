@@ -48,8 +48,19 @@ namespace Estoque.Controllers
             var movimentacoesPorTipoNoUltimoMes = _context.Movimentacoes
                 .Where(m => m.Data >= firstDayOfLastMonth && m.Data <= lastDayOfLastMonth)
                 .Where(m => !m.IsCongelado)
-                .GroupBy(m => m.MovimentacaoTipo)
                 .ToList();
+
+            var movimentacaoEntrada = new List<Movimento>();
+            var movimentacaoSaida = new List<Movimento>();
+            foreach (var item in movimentacoesPorTipoNoUltimoMes
+                .Where(m => m.MovimentacaoTipo == MovimentacaoTipo.eDevolucao)
+                .Where(m => m.MovimentacaoTipo == MovimentacaoTipo.eAquisicao)
+                .Where(m => m.MovimentacaoTipo == MovimentacaoTipo.eFabricacao)
+                )
+            {
+
+            }
+
             var movSumarizado = (
                 from movimentacaoPorTipo in movimentacoesPorTipoNoUltimoMes
                 let somaTotalPorTipo = movimentacaoPorTipo.Sum(m => m.Valor * m.Quantidade)
